@@ -1,0 +1,233 @@
+---
+import "../styles/global.css";
+import { expert, framework } from "../lib/catalog";
+
+interface Props {
+  title: string;
+  description: string;
+  current?: "home" | "agents" | "framework";
+}
+
+const { title, description, current = "home" } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const fullTitle = current === "home" ? title : `${title} · 99x Copilots Studio`;
+const formatDate = (d: string) =>
+  new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#15302a" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="wrap nav" aria-label="Main">
+        <a class="brand" href={base}>
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+          <span>99x Copilots Studio</span>
+        </a>
+        <ul>
+          <li>
+            <a href={`${base}expert-agents/`} aria-current={current === "agents" ? "page" : undefined} class="to-agents">Expert Agents</a>
+          </li>
+          <li>
+            <a href={`${base}delivery-framework/`} aria-current={current === "framework" ? "page" : undefined} class="to-framework"
+              >Delivery Framework</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <div>
+          <p class="footer-brand">99x Copilots Studio</p>
+          <p class="muted">Vetted AI copilots from 99x for teams that build software products.</p>
+        </div>
+        <div>
+          <p class="footer-label">Source repositories</p>
+          <ul>
+            <li><a href={expert.url}>{expert.repo}</a></li>
+            <li><a href={framework.url}>{framework.repo}</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-label">Catalog last synced</p>
+          <p class="muted">
+            Expert Agents at <code>{expert.commit}</code>, {formatDate(expert.date)}<br />
+            Delivery Framework at <code>{framework.commit}</code>, {formatDate(framework.date)}
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Any button with data-copy copies its value (or the text of the element it names) to the clipboard.
+      document.addEventListener("click", async (event) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>("button[data-copy]");
+        if (!button) return;
+        const ref = button.dataset.copyFrom;
+        const text = ref ? document.getElementById(ref)?.textContent ?? "" : button.dataset.copy ?? "";
+        const label = button.textContent;
+        try {
+          await navigator.clipboard.writeText(text.trim());
+          button.textContent = "Copied";
+        } catch {
+          button.textContent = "Select and copy";
+        }
+        setTimeout(() => (button.textContent = label), 1800);
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    padding: 0.5rem 1rem;
+    background: var(--pine);
+    color: var(--on-pine);
+    border-radius: var(--radius-s);
+    z-index: 10;
+  }
+  .skip:focus {
+    top: 1rem;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    font-variation-settings: "wdth" 88;
+    color: var(--pine);
+    text-decoration: none;
+  }
+
+  .brand-mark {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    width: 1.375rem;
+    height: 1.375rem;
+    padding: 3px;
+    border-radius: 5px;
+    background: var(--pine);
+  }
+  .brand-mark i {
+    border-radius: 2px;
+    background: var(--agents-on-pine);
+  }
+  .brand-mark i + i {
+    background: var(--framework-fill);
+  }
+
+  .nav ul {
+    display: flex;
+    gap: clamp(0.75rem, 3vw, 2rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav ul a {
+    font-weight: 500;
+    text-decoration: none;
+    padding-block: 0.4rem;
+    border-bottom: 2px solid transparent;
+  }
+  .nav ul a:hover {
+    border-color: var(--rule);
+  }
+  .nav ul a.to-agents[aria-current="page"] {
+    border-color: var(--agents);
+  }
+  .nav ul a.to-framework[aria-current="page"] {
+    border-color: var(--framework-fill);
+  }
+
+  @media (max-width: 34rem) {
+    .brand span:last-child {
+      display: none;
+    }
+  }
+
+  .site-footer {
+    background: var(--pine);
+    color: var(--on-pine);
+    padding-block: 3.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 48rem) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .footer-brand {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .footer-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .site-footer .muted {
+    color: var(--on-pine-muted);
+  }
+
+  .site-footer ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer code {
+    color: var(--on-pine);
+  }
+</style>

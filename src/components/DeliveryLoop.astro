@@ -1,0 +1,225 @@
+---
+import { LOOP, agentByName, skillByName } from "../lib/catalog";
+
+interface Props {
+  /** Show only the framework's skills (on the framework page) or both libraries. */
+  show?: "both" | "framework";
+}
+const { show = "both" } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<div class="loop" data-show={show}>
+  <ol class="stages">
+    {
+      LOOP.map((stage, i) => (
+        <li class="stage">
+          <div class="stage-head">
+            <span class="stage-n" aria-hidden="true">{i + 1}</span>
+            <h3>{stage.name}</h3>
+          </div>
+          <p class="gist">{stage.gist}</p>
+          <ul class="tools" aria-label={`Framework skills for ${stage.name}`}>
+            {stage.framework.map((n) => (
+              <li class="framework">
+                <a href={`${base}delivery-framework/#skill-${n}`}>{skillByName(n).title}</a>
+              </li>
+            ))}
+          </ul>
+          {show === "both" && (
+            <ul class="tools" aria-label={`Expert agents for ${stage.name}`}>
+              {stage.agents.map((n) => (
+                <li class="agents">
+                  <a href={`${base}expert-agents/#${n}`}>{agentByName(n).title}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  <p class="return">
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"
+      ><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      ></path></svg
+    >
+    Improvements feed the next Inception, so the rules your AI follows get better every cycle.
+  </p>
+  {
+    show === "both" && (
+      <p class="key">
+        <span class="lib framework">Delivery Framework skill</span>
+        <span class="lib agents">Expert Agent</span>
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .stages {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.5rem 1.5rem 1.75rem;
+  }
+
+  .stage + .stage {
+    border-left: 1px solid var(--rule);
+  }
+
+  /* Arrow between stages: a small notch on the shared edge. */
+  .stage + .stage::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 1.9rem;
+    width: 12px;
+    height: 12px;
+    background: var(--surface);
+    border-top: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    transform: rotate(45deg);
+  }
+
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .stage-n {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--framework);
+  }
+
+  .stage h3 {
+    font-size: var(--step-2);
+  }
+
+  .gist {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    min-height: 2.9em;
+  }
+
+  .tools {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+
+  .tools + .tools {
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--rule);
+  }
+
+  .tools li {
+    display: grid;
+    grid-template-columns: 0.6rem 1fr;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .tools li::before {
+    content: "";
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 2px;
+    transform: translateY(0.05em);
+  }
+
+  .tools li.framework::before {
+    background: var(--framework-fill);
+  }
+
+  .tools li.agents::before {
+    background: var(--agents);
+  }
+
+  .tools a {
+    text-decoration: none;
+    color: var(--pine);
+  }
+
+  .tools a:hover {
+    text-decoration: underline;
+  }
+
+  .return {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .return svg {
+    flex: none;
+    color: var(--framework);
+  }
+
+  .key {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 60rem) {
+    .stages {
+      grid-template-columns: 1fr 1fr;
+    }
+    .stage:nth-child(3) {
+      border-left: 0;
+    }
+    .stage:nth-child(n + 3) {
+      border-top: 1px solid var(--rule);
+    }
+    .stage:nth-child(3)::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 36rem) {
+    .stages {
+      grid-template-columns: 1fr;
+    }
+    .stage + .stage {
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .stage + .stage::before {
+      left: 1.75rem;
+      top: -7px;
+      transform: rotate(135deg);
+    }
+    .stage:nth-child(3)::before {
+      display: block;
+    }
+    .gist {
+      min-height: 0;
+    }
+  }
+</style>

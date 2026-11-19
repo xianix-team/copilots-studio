@@ -1,0 +1,511 @@
+---
+import { searchIndex, totals } from "../lib/catalog";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const items = searchIndex(base);
+const tools = [
+  { id: "claude", name: "Claude Code", template: "/mcp__ide-expert-agents__{name}" },
+  { id: "cursor", name: "Cursor", template: "{name}" },
+  { id: "copilot", name: "GitHub Copilot", template: "/mcp.ide-expert-agents.{name}" },
+];
+const suggestions = [
+  "Debug a crash from production logs",
+  "Estimate a new feature",
+  "Accessibility audit of our web app",
+  "Check our code for GDPR issues",
+  "Get ready for a release",
+  "Onboard onto an unfamiliar codebase",
+];
+const payload = JSON.stringify({ items, tools });
+---
+
+<section class="palette" aria-labelledby="palette-label">
+  <div class="palette-bar">
+    <label id="palette-label" for="palette-input">What are you working on?</label>
+    <fieldset class="tool-switch">
+      <legend class="visually-hidden">Show commands for</legend>
+      {
+        tools.map((t, i) => (
+          <label>
+            <input type="radio" name="palette-tool" value={t.id} checked={i === 0} />
+            <span>{t.name}</span>
+          </label>
+        ))
+      }
+    </fieldset>
+  </div>
+
+  <div class="palette-field">
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"
+      ><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"></circle><path
+        d="m15.5 15.5 5 5"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"></path></svg
+    >
+    <input
+      id="palette-input"
+      type="search"
+      autocomplete="off"
+      spellcheck="false"
+      value={suggestions[0]}
+      placeholder="Describe a task, like “write test cases from a PR”"
+      aria-describedby="palette-status"
+      aria-controls="palette-results"
+    />
+  </div>
+
+  <div class="palette-suggest" role="group" aria-label="Example tasks">
+    {suggestions.map((s) => <button type="button" data-suggest={s}>{s}</button>)}
+  </div>
+
+  <p id="palette-status" class="palette-status" aria-live="polite">
+    Searching {totals.agents} expert agents and {totals.frameworkSkills} framework skills.
+  </p>
+  <ol id="palette-results" class="palette-results"></ol>
+
+  <script type="application/json" id="palette-data" set:html={payload} />
+</section>
+
+<script>
+  type Item = {
+    id: string;
+    library: "agents" | "framework";
+    title: string;
+    group: string;
+    summary: string;
+    text: string;
+    name: string;
+    how?: string | null;
+    href: string;
+    autonomy?: string | null;
+    judgement?: string | null;
+  };
+  type Tool = { id: string; name: string; template: string };
+
+  const root = document.querySelector<HTMLElement>(".palette")!;
+  const { items, tools } = JSON.parse(root.querySelector("#palette-data")!.textContent!) as { items: Item[]; tools: Tool[] };
+  const input = root.querySelector<HTMLInputElement>("#palette-input")!;
+  const list = root.querySelector<HTMLOListElement>("#palette-results")!;
+  const status = root.querySelector<HTMLParagraphElement>("#palette-status")!;
+  const toolInputs = root.querySelectorAll<HTMLInputElement>('input[name="palette-tool"]');
+
+  // Words people use for a task, mapped to words the catalog uses for it.
+  const SYNONYMS: Record<string, string[]> = {
+    crash: ["debug", "runtime", "stack", "logs"],
+    bug: ["debug", "runtime", "bug-report", "root"],
+    broken: ["debug", "runtime", "root"],
+    logs: ["runtime", "observability", "logging"],
+    incident: ["root", "hotfix", "rca"],
+    outage: ["hotfix", "incident", "root"],
+    estimate: ["estimation", "pert", "effort"],
+    cost: ["estimate", "effort"],
+    a11y: ["accessibility", "wcag"],
+    accessibility: ["wcag", "a11y"],
+    gdpr: ["privacy", "personal", "gdpr-controls-reviewer"],
+    privacy: ["gdpr", "personal"],
+    security: ["owasp", "vulnerability", "auth"],
+    login: ["auth", "authentication"],
+    test: ["testing", "test-case", "qa"],
+    tests: ["testing", "test-case"],
+    release: ["readiness", "release-readiness", "smoke", "uat"],
+    deploy: ["deployment", "release", "infrastructure"],
+    cloud: ["infrastructure", "deployment", "iac"],
+    infrastructure: ["iac", "terraform", "provision"],
+    onboard: ["codebase", "archaeology", "induction", "onboarding"],
+    unfamiliar: ["archaeology", "codebase", "repo-analyst"],
+    legacy: ["archaeology", "cleanup", "codebase"],
+    design: ["ux", "concept", "design-session"],
+    ux: ["usability", "interaction", "design"],
+    requirement: ["requirements", "elaborate", "analyzer"],
+    requirements: ["elaborate", "analyzer", "scope"],
+    proposal: ["proposal", "pre-sales"],
+    stakeholder: ["progress", "digest", "update"],
+    status: ["progress", "digest", "health"],
+    ai: ["agentic", "ai"],
+    dependencies: ["dependency", "audit", "packages"],
+    packages: ["dependency", "audit"],
+    review: ["audit", "review"],
+    data: ["data-platform", "warehouse", "schema"],
+  };
+  const STOP = new Set(
+    "a an and the of for to in on our my we our with from into how what is are be do can i me it this that new our".split(" "),
+  );
+
+  const tokens = (q: string) =>
+    q
+      .toLowerCase()
+      .split(/[^a-z0-9-]+/)
+      .filter((t) => t.length > 1 && !STOP.has(t));
+
+  const stemOf = (term: string) => (term.length > 5 ? term.slice(0, -2) : term);
+
+  // Words that appear in many items (like "audit" or "review") say little about which one you want,
+  // so each term is weighted by how rare it is across the catalog.
+  const rarity = new Map<string, number>();
+  const weight = (word: string) => {
+    if (!rarity.has(word)) {
+      const df = items.filter((i) => i.text.includes(word)).length;
+      rarity.set(word, Math.max(0.2, Math.log((items.length + 1) / (df + 1))));
+    }
+    return rarity.get(word)!;
+  };
+
+  function score(item: Item, terms: string[]) {
+    let s = 0;
+    const title = item.title.toLowerCase();
+    for (const term of terms) {
+      const stem = stemOf(term);
+      const w = weight(stem);
+      if (item.name.includes(stem)) s += 6 * w;
+      if (title.includes(stem)) s += 5 * w;
+      if (item.group.toLowerCase().includes(stem)) s += 2 * w;
+      if (item.text.includes(stem)) s += 1.5 * w;
+      for (const syn of SYNONYMS[term] ?? []) {
+        const ws = weight(syn);
+        if (item.name.includes(syn)) s += 3 * ws;
+        else if (item.text.includes(syn)) s += 1 * ws;
+      }
+    }
+    return s;
+  }
+
+  let tool = "claude";
+  try {
+    tool = localStorage.getItem("copilots-tool") ?? tool;
+  } catch {}
+  toolInputs.forEach((r) => (r.checked = r.value === tool));
+
+  const commandFor = (item: Item) => {
+    if (item.library === "framework") return item.how ?? null;
+    const t = tools.find((x) => x.id === tool) ?? tools[0];
+    return t.template.replace("{name}", item.name);
+  };
+
+  const hintFor = (item: Item) => {
+    if (item.library === "framework")
+      return item.how ? "Copy the skill into your repo, then say" : "Runs inside the full framework";
+    if (tool === "cursor") return "In agent mode, type / and pick";
+    return "Type";
+  };
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  // Same markup as the Ratings component, so the shared styles in global.css apply.
+  const cap = (l: string) => l.charAt(0).toUpperCase() + l.slice(1);
+  function ratings(item: Item) {
+    const dl = el("dl", "ratings dark");
+    for (const [kind, label, level] of [
+      ["autonomy", "Autonomy", item.autonomy],
+      ["judgement", "Human judgement", item.judgement],
+    ] as const) {
+      if (!level) continue;
+      const row = el("div", "rating");
+      row.dataset.kind = kind;
+      const dd = el("dd");
+      const meter = el("span", "meter");
+      meter.dataset.level = level;
+      meter.setAttribute("aria-hidden", "true");
+      meter.append(el("i"), el("i"), el("i"));
+      dd.append(meter, document.createTextNode(cap(level)));
+      row.append(el("dt", undefined, label), dd);
+      dl.append(row);
+    }
+    return dl;
+  }
+
+  function render() {
+    const terms = tokens(input.value);
+    list.replaceChildren();
+    if (terms.length === 0) {
+      status.textContent = `Describe a task to search ${items.filter((i) => i.library === "agents").length} expert agents and ${items.filter((i) => i.library === "framework").length} framework skills.`;
+      return;
+    }
+    const scored = items.map((item) => ({ item, s: score(item, terms) })).sort((a, b) => b.s - a.s);
+    // Keep only results reasonably close to the best one, so weak matches don't pad the list.
+    const floor = Math.max(4, (scored[0]?.s ?? 0) * 0.45);
+    const ranked = scored.filter((r) => r.s >= floor).slice(0, 5);
+
+    if (ranked.length === 0) {
+      status.textContent = "No matches yet. Try naming the task, like “test plan”, “root cause” or “proposal”.";
+      return;
+    }
+    status.textContent = `${ranked.length} ${ranked.length === 1 ? "match" : "best matches"}`;
+
+    for (const { item } of ranked) {
+      const li = el("li", "hit");
+      const head = el("div", "hit-head");
+      head.append(el("span", `lib ${item.library}`, item.library === "agents" ? "Expert Agent" : "Framework skill"));
+      head.append(el("span", "hit-group", item.group));
+      const title = el("a", "hit-title", item.title);
+      (title as HTMLAnchorElement).href = item.href;
+      const summary = el("p", "hit-summary", item.summary);
+      li.append(head, title, summary);
+      if (item.autonomy || item.judgement) li.append(ratings(item));
+
+      const cmd = commandFor(item);
+      const row = el("div", "hit-command");
+      row.append(el("span", "hit-hint", hintFor(item)));
+      if (cmd) {
+        const code = el("code", undefined, cmd);
+        const copy = el("button", "copy", "Copy");
+        copy.type = "button";
+        copy.setAttribute("aria-label", `Copy command for ${item.title}`);
+        copy.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(cmd);
+            copy.textContent = "Copied";
+          } catch {
+            copy.textContent = "Select and copy";
+          }
+          setTimeout(() => (copy.textContent = "Copy"), 1800);
+        });
+        row.append(code, copy);
+      }
+      li.append(row);
+      list.append(li);
+    }
+  }
+
+  input.addEventListener("input", render);
+  root.querySelectorAll<HTMLButtonElement>("[data-suggest]").forEach((b) =>
+    b.addEventListener("click", () => {
+      input.value = b.dataset.suggest!;
+      render();
+      input.focus();
+    }),
+  );
+  toolInputs.forEach((r) =>
+    r.addEventListener("change", () => {
+      tool = r.value;
+      try {
+        localStorage.setItem("copilots-tool", tool);
+      } catch {}
+      render();
+    }),
+  );
+  render();
+</script>
+
+<style>
+  .palette {
+    background: var(--pine);
+    color: var(--on-pine);
+    border-radius: var(--radius-m);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    box-shadow:
+      0 1px 0 var(--pine-3) inset,
+      0 24px 60px -30px rgb(21 48 42 / 0.55);
+  }
+
+  .palette-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .palette-bar > label {
+    font-family: var(--display);
+    font-weight: 650;
+    font-size: var(--step-1);
+    font-variation-settings: "wdth" 92;
+  }
+
+  .tool-switch {
+    display: inline-flex;
+    margin: 0;
+    padding: 3px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pine-2);
+  }
+
+  .tool-switch label {
+    position: relative;
+  }
+
+  .tool-switch input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .tool-switch span {
+    display: block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--on-pine-muted);
+  }
+
+  .tool-switch input:checked + span {
+    background: var(--on-pine);
+    color: var(--pine);
+  }
+
+  .tool-switch input:focus-visible + span {
+    outline: 2px solid var(--agents-on-pine);
+    outline-offset: 1px;
+  }
+
+  .palette-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-s);
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  .palette-field:focus-within {
+    outline: 3px solid var(--agents-on-pine);
+    outline-offset: 2px;
+  }
+
+  .palette-field input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    padding: 0.85rem 0;
+    background: transparent;
+    font: inherit;
+    font-size: var(--step-1);
+    color: var(--pine);
+  }
+
+  .palette-field input:focus {
+    outline: none;
+  }
+
+  .palette-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.875rem;
+  }
+
+  .palette-suggest button {
+    font: inherit;
+    font-size: var(--step--1);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--pine-3);
+    background: transparent;
+    color: var(--on-pine);
+    cursor: pointer;
+  }
+
+  .palette-suggest button:hover {
+    background: var(--pine-2);
+  }
+
+  .palette-status {
+    margin-top: 1.25rem;
+    font-size: var(--step--1);
+    color: var(--on-pine-muted);
+  }
+
+  .palette-results {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+  }
+
+  .palette-results :global(.hit) {
+    display: grid;
+    gap: 0.3rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--pine-3);
+  }
+
+  .palette-results :global(.hit-head) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    align-items: center;
+  }
+
+  .palette-results :global(.lib.agents) {
+    color: var(--agents-on-pine);
+  }
+
+  .palette-results :global(.lib.framework) {
+    color: var(--framework-fill);
+  }
+
+  .palette-results :global(.hit-group) {
+    font-size: var(--step--1);
+    color: var(--on-pine-muted);
+  }
+
+  .palette-results :global(.hit-title) {
+    font-family: var(--display);
+    font-weight: 650;
+    font-size: var(--step-1);
+    font-variation-settings: "wdth" 92;
+    color: var(--on-pine);
+    text-decoration: none;
+    justify-self: start;
+  }
+
+  .palette-results :global(.hit-title:hover) {
+    text-decoration: underline;
+  }
+
+  .palette-results :global(.hit-summary) {
+    color: var(--on-pine-muted);
+    max-width: 72ch;
+    font-size: 0.9375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .palette-results :global(.hit-command) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-top: 0.35rem;
+    font-size: var(--step--1);
+  }
+
+  .palette-results :global(.hit-hint) {
+    color: var(--on-pine-muted);
+  }
+
+  .palette-results :global(.hit-command code) {
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: var(--pine-2);
+    color: var(--on-pine);
+    overflow-wrap: anywhere;
+  }
+
+  .palette-results :global(.copy) {
+    font: inherit;
+    font-size: var(--step--1);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--pine-3);
+    background: transparent;
+    color: var(--on-pine);
+    cursor: pointer;
+  }
+
+  .palette-results :global(.copy:hover) {
+    background: var(--pine-2);
+  }
+</style>

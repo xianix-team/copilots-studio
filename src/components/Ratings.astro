@@ -1,0 +1,33 @@
+---
+import { RATINGS, levelName } from "../lib/catalog";
+
+interface Props {
+  autonomy: string | null;
+  judgement: string | null;
+  /** "dark" for use on the pine panels. */
+  tone?: "light" | "dark";
+}
+const { autonomy, judgement, tone = "light" } = Astro.props;
+const rows = [
+  { key: "autonomy", rating: RATINGS.autonomy, level: autonomy },
+  { key: "judgement", rating: RATINGS.humanJudgement, level: judgement },
+] as const;
+---
+
+<dl class:list={["ratings", tone]}>
+  {
+    rows.map(({ key, rating, level }) => (
+      <div class="rating" data-kind={key} title={level ? rating.levels[level as keyof typeof rating.levels] : undefined}>
+        <dt>{rating.name}</dt>
+        <dd>
+          <span class="meter" data-level={level ?? "none"} aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          {levelName(level)}
+        </dd>
+      </div>
+    ))
+  }
+</dl>

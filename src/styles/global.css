@@ -1,0 +1,419 @@
+@import "@fontsource-variable/bricolage-grotesque/standard.css";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/400-italic.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+:root {
+  /* Palette: cool field-notebook paper, pine ink, one hue per library. */
+  --paper: #f2f4f0;
+  --paper-sunk: #e5eae3;
+  --surface: #fbfcfa;
+  --pine: #15302a;
+  --pine-2: #1e3d36;
+  --pine-3: #2d5249;
+  --text: #22312c;
+  --muted: #56635e;
+  --rule: #cbd3cc;
+  --on-pine: #e8eee9;
+  --on-pine-muted: #a9bab3;
+
+  --agents: #2b47d9; /* IDE Expert Agents */
+  --agents-tint: #e2e7fb;
+  --agents-on-pine: #9fb1ff;
+  --framework: #985500; /* Intent Delivery Framework, text-safe */
+  --framework-fill: #f2a93b;
+  --framework-tint: #fbebd0;
+
+  --display: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.625rem;
+  --step-3: clamp(2rem, 1.4rem + 2.4vw, 2.875rem);
+  --step-4: clamp(2.75rem, 1.6rem + 5vw, 5.25rem);
+
+  --measure: 66ch;
+  --page: 76rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --radius-s: 6px;
+  --radius-m: 14px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--display);
+  color: var(--pine);
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--step-4);
+  font-weight: 750;
+  font-variation-settings: "wdth" 82, "opsz" 96;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+}
+
+h2 {
+  font-size: var(--step-3);
+  font-weight: 700;
+  font-variation-settings: "wdth" 88, "opsz" 72;
+  letter-spacing: -0.012em;
+}
+
+h3 {
+  font-size: var(--step-1);
+  font-weight: 650;
+  font-variation-settings: "wdth" 95, "opsz" 24;
+  line-height: 1.25;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--mono);
+  font-size: 0.9em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--agents);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--framework-fill);
+  color: var(--pine);
+}
+
+.wrap {
+  max-width: var(--page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+}
+
+.section + .section {
+  border-top: 1px solid var(--rule);
+}
+
+.section-head {
+  display: grid;
+  gap: 1rem;
+  max-width: 46rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--pine);
+  color: var(--on-pine);
+  border: 1px solid var(--pine);
+  transition: background-color 150ms ease;
+}
+
+.button:hover {
+  background: var(--pine-3);
+}
+
+.button.ghost {
+  background: transparent;
+  color: var(--pine);
+}
+
+.button.ghost:hover {
+  background: var(--paper-sunk);
+}
+
+/* Library markers: a small square in the library's colour, used wherever an item's origin matters. */
+.lib {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: var(--step--1);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lib::before {
+  content: "";
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.lib.agents {
+  color: var(--agents);
+}
+
+.lib.framework {
+  color: var(--framework);
+}
+
+.chip {
+  display: inline-block;
+  font-size: var(--step--1);
+  font-weight: 500;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--paper-sunk);
+  color: var(--pine);
+  white-space: nowrap;
+}
+
+pre.snippet {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: var(--pine);
+  color: var(--on-pine);
+  border-radius: var(--radius-s);
+  overflow-x: auto;
+  line-height: 1.55;
+  font-size: 0.875rem;
+}
+
+.copy-button {
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 500;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--pine);
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  background: var(--paper-sunk);
+}
+
+.snippet-block {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.snippet-block header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9375rem;
+}
+
+.snippet-block header p {
+  font-weight: 600;
+  color: var(--pine);
+}
+
+/* Segmented control shared by the tool pickers. */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--paper-sunk);
+}
+
+.segmented label {
+  position: relative;
+}
+
+.segmented input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segmented span {
+  display: block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.segmented input:checked + span {
+  background: var(--pine);
+  color: var(--on-pine);
+}
+
+.segmented input:focus-visible + span {
+  outline: 3px solid var(--agents);
+  outline-offset: 1px;
+}
+
+/* Autonomy and human-judgement ratings: three rising bars, filled up to the level, with the level in words. */
+.ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  font-size: var(--step--1);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.rating dt {
+  color: var(--muted);
+}
+
+.rating dd {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--pine);
+}
+
+.meter {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 0.8rem;
+}
+
+.meter i {
+  width: 4px;
+  border-radius: 1px;
+  background: var(--rule);
+}
+
+.meter i:nth-child(1) {
+  height: 40%;
+}
+.meter i:nth-child(2) {
+  height: 70%;
+}
+.meter i:nth-child(3) {
+  height: 100%;
+}
+
+.rating[data-kind="autonomy"] .meter {
+  --fill: var(--agents);
+}
+.rating[data-kind="judgement"] .meter {
+  --fill: var(--pine);
+}
+
+.meter[data-level="low"] i:nth-child(-n + 1),
+.meter[data-level="medium"] i:nth-child(-n + 2),
+.meter[data-level="high"] i {
+  background: var(--fill);
+}
+
+.ratings.dark .rating dt {
+  color: var(--on-pine-muted);
+}
+.ratings.dark .rating dd {
+  color: var(--on-pine);
+}
+.ratings.dark .meter i {
+  background: var(--pine-3);
+}
+.ratings.dark .rating[data-kind="autonomy"] .meter {
+  --fill: var(--agents-on-pine);
+}
+.ratings.dark .rating[data-kind="judgement"] .meter {
+  --fill: var(--on-pine);
+}
+.ratings.dark .meter[data-level="low"] i:nth-child(-n + 1),
+.ratings.dark .meter[data-level="medium"] i:nth-child(-n + 2),
+.ratings.dark .meter[data-level="high"] i {
+  background: var(--fill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

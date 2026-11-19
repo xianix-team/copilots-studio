@@ -1,0 +1,424 @@
+---
+import Base from "../layouts/Base.astro";
+import CommandPalette from "../components/CommandPalette.astro";
+import DeliveryLoop from "../components/DeliveryLoop.astro";
+import { disciplines, expert, framework, totals } from "../lib/catalog";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<Base
+  title="99x Copilots Studio"
+  description={`AI copilots from 99x for product engineering teams: ${totals.agents} expert agents and a delivery framework that runs in Claude Code, Cursor and GitHub Copilot.`}
+>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <h1>Put AI to work across the whole product lifecycle.</h1>
+        <p class="lede">
+          Two open libraries from 99x. Expert agents bring a specialist’s method to any task, and the Intent Delivery
+          Framework sets how your team and its AI work together. Both run in Claude Code, Cursor and GitHub Copilot.
+        </p>
+      </div>
+      <CommandPalette />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="libraries">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="libraries">Two libraries, two jobs</h2>
+        <p class="lede">
+          Use an expert agent when you need a specialist for one task. Adopt the framework when you want the whole team to
+          deliver with AI in a consistent, governed way.
+        </p>
+      </div>
+
+      <div class="libraries">
+        <article class="library agents">
+          <p class="lib agents">IDE Expert Agents</p>
+          <h3>Specialist skills, on call</h3>
+          <p>
+            One MCP server turns every agent into a slash command in your IDE. Ask for a security scan, a test plan or an
+            estimate, and the agent follows the specialist’s method and checklists, then shows you the evidence.
+          </p>
+          <p>
+            Each agent states how much of the task it does on its own, and how much human judgement its output needs before you
+            act on it.
+          </p>
+          <p class="figure"><strong>{totals.agents}</strong> agents across <strong>{totals.disciplines}</strong> disciplines</p>
+          <ul class="discipline-list">
+            {
+              disciplines.map((d) => (
+                <li>
+                  <a href={`${base}expert-agents/#discipline-${d.id}`}>{d.name}</a>
+                  <span>{d.count}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="button" href={`${base}expert-agents/`}>Browse the agents</a>
+        </article>
+
+        <article class="library framework">
+          <p class="lib framework">Intent Delivery Framework</p>
+          <h3>A way of working with AI</h3>
+          <p>
+            Installed through a conversation with your team, not stamped from a template. The result is a repository where any
+            engineer, or AI tool, knows exactly how to work.
+          </p>
+          <ul class="promises">
+            <li>Every feature starts with a written intent and testable acceptance criteria.</li>
+            <li>Every AI interaction passes a quality gate and is logged for audit.</li>
+            <li>Every failure feeds back into rules that stop it happening again.</li>
+          </ul>
+          <dl class="counts">
+            <div><dt>Agents</dt><dd>{totals.frameworkAgents}</dd></div>
+            <div><dt>Skills</dt><dd>{totals.frameworkSkills}</dd></div>
+            <div><dt>Starter activities</dt><dd>{totals.activities}</dd></div>
+          </dl>
+          <a class="button" href={`${base}delivery-framework/`}>Explore the framework</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="fit">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="fit">How they fit together</h2>
+        <p class="lede">
+          The framework runs delivery as a loop. Expert agents slot in wherever a stage needs a specialist. Here’s where some of
+          them fit.
+        </p>
+      </div>
+      <DeliveryLoop />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tools">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="tools">Works in the tools you already use</h2>
+        <p class="lede">The content is the same in every tool. Only the way you call it changes.</p>
+      </div>
+      <div class="table-scroll">
+        <table class="tools-table">
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">Library</span></th>
+              <th scope="col">Claude Code</th>
+              <th scope="col">Cursor</th>
+              <th scope="col">GitHub Copilot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><span class="lib agents">Run an expert agent</span></th>
+              <td><code>/mcp__ide-expert-agents__estimate</code></td>
+              <td>In agent mode, type <code>/</code> and pick <code>estimate</code></td>
+              <td><code>/mcp.ide-expert-agents.estimate</code>, or ask in agent mode</td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="lib framework">Framework rule file</span></th>
+              <td><code>CLAUDE.md</code> at the repo root</td>
+              <td><code>.cursor/rules/project-rules.mdc</code></td>
+              <td><code>.github/copilot-instructions.md</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section start" aria-labelledby="start">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="start">Start today</h2>
+      </div>
+      <div class="paths">
+        <article>
+          <p class="lib agents">IDE Expert Agents</p>
+          <h3>Run your first agent in five minutes</h3>
+          <ol class="steps">
+            <li>
+              Add the server. In Claude Code:
+              <pre class="snippet"><code>claude mcp add -s user ide-expert-agents -- npx -y {expert.npmPackage}</code></pre>
+            </li>
+            <li>Open your project and run an agent, such as <code>/mcp__ide-expert-agents__codebase-archaeology</code>.</li>
+            <li>Review what it found before you act on it.</li>
+          </ol>
+          <a href={`${base}expert-agents/#setup`}>Setup for Cursor, GitHub Copilot and team servers</a>
+        </article>
+        <article>
+          <p class="lib framework">Intent Delivery Framework</p>
+          <h3>Bring the framework to your team</h3>
+          <ol class="steps">
+            <li>Copy <code>process-onboarding-agent/</code> from the repository into your project root.</li>
+            <li>
+              Open your AI assistant in the project and say:
+              <pre class="snippet"><code>Read process-onboarding-agent/onboard.md and follow the instructions inside it.</code></pre>
+            </li>
+            <li>From the next session, start your first feature: <em>“Run a mob elaboration for [first intent name]”</em>.</li>
+          </ol>
+          <a href={`${base}delivery-framework/#adopt`}>Not ready to onboard? Start with small wins</a>
+        </article>
+      </div>
+      <p class="sources">
+        Both libraries are open source: <a href={expert.url}>{expert.repo}</a> and <a href={framework.url}>{framework.repo}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(3rem, 8vw, 6rem) clamp(3.5rem, 8vw, 6rem);
+  }
+
+  .hero .wrap {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .hero-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 1.5rem clamp(2rem, 5vw, 4rem);
+  }
+
+  .hero-copy .lede {
+    padding-bottom: 0.4rem;
+  }
+
+  @media (max-width: 56rem) {
+    .hero-copy {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .libraries {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  @media (max-width: 56rem) {
+    .libraries {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .library {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+
+  .library.agents {
+    border-top: 6px solid var(--agents);
+  }
+
+  .library.framework {
+    border-top: 6px solid var(--framework-fill);
+  }
+
+  .library h3 {
+    font-size: var(--step-2);
+  }
+
+  .library > p:not(.lib, .figure) {
+    max-width: 58ch;
+  }
+
+  .library .button {
+    justify-self: start;
+    margin-top: 0.5rem;
+  }
+
+  .figure {
+    font-size: var(--step-1);
+    color: var(--pine);
+  }
+
+  .figure strong {
+    font-family: var(--display);
+    font-weight: 750;
+    font-size: var(--step-2);
+    color: var(--agents);
+  }
+
+  .discipline-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+
+  .discipline-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .discipline-list li:nth-child(odd) {
+    margin-right: 1.25rem;
+  }
+
+  .discipline-list a {
+    text-decoration: none;
+    color: var(--pine);
+  }
+
+  .discipline-list a:hover {
+    text-decoration: underline;
+  }
+
+  .discipline-list span {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 30rem) {
+    .discipline-list {
+      grid-template-columns: 1fr;
+    }
+    .discipline-list li:nth-child(odd) {
+      margin-right: 0;
+    }
+  }
+
+  .promises {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .promises li {
+    padding-left: 1rem;
+    border-left: 3px solid var(--framework-fill);
+  }
+
+  .counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin: 0.5rem 0 0;
+  }
+
+  .counts div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .counts dt {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .counts dd {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 750;
+    font-size: var(--step-3);
+    line-height: 1;
+    color: var(--framework);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .tools-table {
+    width: 100%;
+    min-width: 46rem;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .tools-table th,
+  .tools-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 1rem 1rem 1rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .tools-table thead th {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    font-weight: 650;
+    color: var(--pine);
+  }
+
+  .tools-table tbody th {
+    width: 14rem;
+  }
+
+  .tools-table code {
+    overflow-wrap: anywhere;
+  }
+
+  .paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+
+  @media (max-width: 56rem) {
+    .paths {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .paths article {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .paths h3 {
+    font-size: var(--step-2);
+  }
+
+  .steps {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding-left: 1.4rem;
+  }
+
+  .steps li {
+    padding-left: 0.4rem;
+  }
+
+  .steps li::marker {
+    font-family: var(--display);
+    font-weight: 700;
+    color: var(--pine);
+  }
+
+  .steps pre {
+    margin-top: 0.6rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .sources {
+    margin-top: 3rem;
+    color: var(--muted);
+  }
+</style>

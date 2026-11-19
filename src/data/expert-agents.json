@@ -1,0 +1,559 @@
+{
+  "repo": "xianix-team/ide-expert-agents",
+  "url": "https://github.com/xianix-team/ide-expert-agents",
+  "commit": "6b8b137",
+  "date": "2026-11-19",
+  "npmPackage": "@99x-ai-dlc/ide-expert-agents-mcp",
+  "disciplines": [
+    {
+      "id": "idf-agents-store",
+      "description": "Structured software delivery — design, risk, UAT, RCA, process health, and more",
+      "count": 9
+    },
+    {
+      "id": "devops-agents-store",
+      "description": "Infrastructure provisioning and IaC generation",
+      "count": 1
+    },
+    {
+      "id": "architect-agents-store",
+      "description": "Architecture design, review, and cloud deployment inspection — product backend and frontend architecture design, deployment fitness assessment, agentic AI review, product-engineering foundations checklist, and release readiness checklist",
+      "count": 6
+    },
+    {
+      "id": "coding-agents-store",
+      "description": "Code quality and targeted improvements — error handling audit, runtime debugging from logs/crashes/requirements, observability implementation (logging/metrics/tracing) with cost guardrails, authentication/authorization implementation mapped to OWASP ASVS / NIST guidance, and behavior-preserving code cleanup for vibe-coded / overgrown codebases",
+      "count": 5
+    },
+    {
+      "id": "qa-agents-store",
+      "description": "Testing and quality assurance — OWASP static security scanning, black-box / white-box / smoke & sanity / exploratory testing, UI/UX & WCAG accessibility audits, Playwright test authoring from explored sessions, test case generation from specs, diffs, or code alone, and bug reports from annotated screenshots",
+      "count": 10
+    },
+    {
+      "id": "ux-agents-store",
+      "description": "UX design and research — persona/journey/service-blueprint/competitive-analysis/prototype generation, design-consistency auditing, design-concept generation, interaction-design review, and design-rationale documentation",
+      "count": 9
+    },
+    {
+      "id": "pre-sales-agents-store",
+      "description": "Pre-sales pipeline — agentic AI opportunity mining, AI readiness assessment, discovery interview, requirement elaboration, effort estimation, proposal assembly, and case-study drafting from delivered codebases",
+      "count": 7
+    },
+    {
+      "id": "data-platform-agents-store",
+      "description": "Data-platform analysis and evolution — repo analysis, due diligence, architecture advisory, opportunity scouting, implementation, validation, regression monitoring, and cycle close-out",
+      "count": 8
+    },
+    {
+      "id": "compliance-agents-store",
+      "description": "AI compliance, data protection, and governance — EU AI Act controls review with ISO 42001 and NIST AI RMF mapping, and GDPR controls review (personal-data inventory, data-subject rights, LLM data flows, transfers) with ISO 27701 and NIST Privacy Framework mapping",
+      "count": 2
+    },
+    {
+      "id": "delivery-agents-store",
+      "description": "Delivery management — DORA-inspired commitment health reporting, and parallel-execution planning (dependency mapping + wave scheduling), adapted for AI-led development",
+      "count": 2
+    },
+    {
+      "id": "feature-agents-store",
+      "description": "Feature implementation — skills for building specific product features end-to-end, e.g. an AI \"digital salesperson\" that maps user intent (chat + generated action buttons) to the product's real features/services, with per-user preference memory and a cross-user plot library",
+      "count": 1
+    },
+    {
+      "id": "analyst-agents-store",
+      "description": "Business/systems analysis — critically evaluating requirements against the Paul-Elder Critical Thinking Framework before they're scoped or built",
+      "count": 1
+    }
+  ],
+  "agents": [
+    {
+      "name": "design-session",
+      "title": "Design Session",
+      "whenToUse": "Before the first unit is proposed in any mob elaboration — establishes API contracts, data models, and architectural patterns as binding constraints",
+      "description": "Run a design session (Phase 0 of mob elaboration) to establish API contracts, data models, and architectural patterns before decomposing an intent into units. Invoke before the first unit is proposed in any mob elaboration session.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/design-session"
+    },
+    {
+      "name": "bolt-risk-assessment",
+      "title": "Bolt Risk Assessment",
+      "whenToUse": "After elaboration sign-off, before the first unit in a bolt executes — assesses blast radius, sequencing risks, rollback, and feature flag requirements",
+      "description": "Assess a planned bolt for blast radius, sequencing risks, rollback feasibility, and feature flag requirements before execution begins. Invoke after elaboration sign-off and before the first unit in a bolt executes.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/bolt-risk-assessment"
+    },
+    {
+      "name": "uat",
+      "title": "UAT",
+      "whenToUse": "When all units under an intent are marked Done — generates a plain-language demo script and records the stakeholder validation outcome",
+      "description": "Generate a plain-language UAT demo script from an intent's acceptance criteria, guide the engineer through a validation session, and record the outcome in the intent file. Invoke when all units under an intent are marked Done.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/uat"
+    },
+    {
+      "name": "root-cause-analysis",
+      "title": "Root Cause Analysis",
+      "whenToUse": "When an incident is resolved or recurring failures suggest a systemic issue — surfaces root causes across solution design, technology, and process",
+      "description": "Analyse resolved incidents and filed improvements to surface root causes beyond the immediate fix. Identifies structural gaps in solution design, technology selection, and process. Invoke when an incident is marked Resolved or when recurring failures suggest a systemic issue.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/root-cause-analysis"
+    },
+    {
+      "name": "progress-digest",
+      "title": "Progress Digest",
+      "whenToUse": "At any point during delivery — generates a plain-language stakeholder update with no engineering jargon",
+      "description": "Generate a plain-language stakeholder progress update for a feature intent. Translates engineering artifacts into a one-page summary written for non-technical stakeholders — no jargon, no file paths, no technical terms. Invoke at any point during or after delivery of an intent.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/progress-digest"
+    },
+    {
+      "name": "new-engineer-induction",
+      "title": "New Engineer Induction",
+      "whenToUse": "When an engineer joins the project for the first time — explains the framework using the project's actual files and produces a personalised quick-reference card",
+      "description": "Guide a new engineer joining an AI-DLC project through their first session. Explains the framework using the project's actual files and domain language, runs a practice elaboration, and produces a personalised quick-reference card. Invoke when an engineer says they are new to the project or asks to be walked through how to work here.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/new-engineer-induction"
+    },
+    {
+      "name": "process-health",
+      "title": "Process Health",
+      "whenToUse": "After every third or fourth bolt, or when the team suspects process drift — produces a quantitative health report across four metrics",
+      "description": "Analyse the project's AI-DLC operational artifacts and produce a quantitative process health report. Surfaces improvement adoption gaps, recurring quality gate failures, AC quality drift, and bolt velocity trends. Invoke after every third or fourth bolt, or whenever the team suspects process drift.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/process-health"
+    },
+    {
+      "name": "dependency-audit",
+      "title": "Dependency Audit",
+      "whenToUse": "Monthly or when the scheduled audit date in the master rule file is reached — audits dependencies and converts findings into remediation backlog items",
+      "description": "Audit the project's third-party dependencies for major version drift, known vulnerability patterns, and end-of-life packages. Produces a ranked findings list and converts actionable findings into remediation units in the backlog. Invoke on a monthly cadence or when prompted by the scheduled audit date in the master rule file.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/dependency-audit"
+    },
+    {
+      "name": "codebase-archaeology",
+      "title": "Codebase Archaeology",
+      "whenToUse": "Before onboarding AI-DLC into a mature project, before joining a new team, or as a standalone technical due diligence exercise — maps architecture, extracts coding patterns, audits for defects and technical debt, and classifies all identified work",
+      "description": "Run a structured codebase archaeology analysis on an existing project. Maps architecture, extracts coding patterns, audits for defects and technical debt, and classifies all identified work. Use before onboarding AI-DLC into a mature project, before joining a new team, or as a standalone technical due diligence exercise.",
+      "discipline": "idf-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/idf-agents-store/codebase-archaeology"
+    },
+    {
+      "name": "iac-generator",
+      "title": "IPA — Infrastructure Provisioning Agent",
+      "whenToUse": "When you want to provision cloud infrastructure, generate Terraform / Bicep / Pulumi / CDK, design a target cloud architecture, or stand up environments for an existing repo — IPA scans the codebase, asks targeted questions, and generates IaC with a step-by-step approval flow",
+      "description": "IPA is the Infrastructure Provisioning Agent for DevOps engineers. It scans a codebase to discover the resources an app needs (services, datastores, caches, queues, storage, secrets, ports), asks targeted questions (starting with which cloud - AWS, Azure, or Google Cloud), and generates Infrastructure-as-Code with a plan you approve step by step. Use when the user wants to provision cloud infrastructure, generate Terraform/Bicep/Pulumi/CDK, design a target cloud architecture, or stand up environments for an existing repo. IPA reverses the conversation (it discovers and asks first, then proposes) and never applies or destroys real infrastructure without explicit human approval.",
+      "discipline": "devops-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/devops-agents-store/iac-generator"
+    },
+    {
+      "name": "product-backend-architect",
+      "title": "Product Backend Architect",
+      "whenToUse": "When you need to design, or evolve, the backend for a product or major feature — confirms architecture drivers (scenarios, quality-attribute targets, compliance requirements, constraints) first, then produces a backend architecture spec covering architecture style, decomposition, data architecture and migration safety, API contracts, integration/events, reliability, scalability, security and privacy, compliance, responsible usage of AI, and observability, with each decision traced to a driver. Greenfield or existing backend; read-only on code, writes only the spec",
+      "description": "Produces a backend architecture specification for a product or a major feature: architecture style, service/module decomposition, data architecture and migration safety, API contracts, integration and events, reliability, performance and scalability, security and privacy, compliance, responsible usage of AI, and observability. Every decision is recorded with options, trade-offs, and the driver behind it. Works greenfield or on an existing backend, which it reads first to ground the design. Read-only on the codebase; writes only the spec file. Use when asked to \"design the backend\", \"architect the backend for this product\", \"how should we structure our services/APIs/data\", \"review and evolve our backend architecture\", or before building a backend whose shape isn't settled yet.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/product-backend-architect"
+    },
+    {
+      "name": "product-frontend-architect",
+      "title": "Product Frontend Architect",
+      "whenToUse": "When you need to design, or evolve, the frontend for a product or major feature — confirms architecture drivers (user scenarios, performance and accessibility targets, browser/device support, compliance requirements, constraints) first, then produces a frontend architecture spec covering rendering approach, business-logic placement (client vs BFF vs backend), module structure, state and API integration, security, privacy, compliance, performance budgets, UX-supporting architecture (accessibility, i18n, resilience states), responsible usage of AI, observability, and build/delivery, with each decision traced to a driver. Leaves UX design to the UX agents; greenfield or existing frontend; read-only on code, writes only the spec",
+      "description": "Produces a frontend architecture specification for a product or a major feature: rendering and application architecture, business-logic placement (client, BFF, or backend), module structure, state and data management, API integration, security, privacy, compliance, performance, the architecture that supports UX (accessibility, i18n, resilience states), responsible usage of AI, observability, and build and delivery. Every decision is recorded with options, trade-offs, and the driver behind it. Works greenfield or on an existing frontend, which it reads first to ground the design. Read-only on the codebase; writes only the spec file. Use when asked to \"design the frontend architecture\", \"architect the web app\", \"where should this logic live\", \"how do we secure / speed up our frontend\", \"review and evolve our frontend architecture\", or before building a frontend whose shape isn't settled yet.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/product-frontend-architect"
+    },
+    {
+      "name": "deployment-architect",
+      "title": "Deployment Architect",
+      "whenToUse": "When you want to inspect a live cloud deployment on Azure, AWS, or GCP — authenticates via the local CLI, discovers all resources, produces an as-deployed architecture document, and runs a structured fitness assessment across performance, security, reliability, robustness, observability, and cost efficiency. Read-only, never modifies resources",
+      "description": "Inspect a live cloud application deployment on Azure, AWS, or GCP. Authenticates using the local CLI, discovers all deployed resources, produces an as-deployed architecture document, and runs a structured fitness assessment against non-functional quality attributes — performance, security, reliability, robustness, observability, and cost efficiency. Read-only — never modifies cloud resources. Use before a go-live review, after an incident, or as a periodic architecture health check.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/deployment-architect"
+    },
+    {
+      "name": "agentic-ai-reviewer",
+      "title": "Agentic AI Reviewer",
+      "whenToUse": "When you want to review an agentic-AI codebase (RAG, tool-calling, conversational/support, multi-agent, ML-backed, or autopilot) against the Agentic AI Review Checklists — ISO/IEC 42001-aligned reliability, security, and best-practice controls. Reads code, config, prompts, IaC, CI, and tests, assesses every control verifiable from the repo, flags the rest for human review, and writes a single Markdown fitness report. Read-only, never modifies code",
+      "description": "Review an agentic-AI codebase (RAG, tool-calling, conversational/support, multi-agent, ML-backed, or autopilot) against the Agentic AI Review Checklists — a set of ISO/IEC 42001-aligned reliability, security, and best-practice controls. Reads source code, config, prompts, IaC, CI, and tests, then assesses every control that is verifiable from the repository, flags the rest for human review, and writes a single Markdown fitness report. Strictly read-only — never modifies application code. Use before a go-live review, when hardening an AI agent, or as a periodic quality/compliance check.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/agentic-ai-reviewer"
+    },
+    {
+      "name": "product-engineering-essentials",
+      "title": "Product Engineering Essentials",
+      "whenToUse": "When you want a shared, evidence-based picture of a repository's product-engineering foundations — assesses ten pillars (vision, domain, requirements, UX, architecture, engineering practices, DevOps, QE, security/compliance, delivery feedback loop) and produces a checklist report of what's in place, partial, or missing. Never blocks work, standalone on any repository",
+      "description": "Assess how much of the foundational product-engineering groundwork a repository actually has in place, across ten pillars spanning product vision, domain understanding, requirements, UX, architecture, engineering practices, DevOps, quality engineering, security/compliance, and the delivery feedback loop. Produces a checklist report — what exists, what's partial, and what's missing. Standalone: works on any repository, with no other framework required. Use when the user wants a shared, evidence-based picture of engineering foundations, or asks \"what's missing from our essentials\", \"check our product engineering foundations\", or similar.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/product-engineering-essentials"
+    },
+    {
+      "name": "release-readiness-checklist",
+      "title": "Release Readiness Checklist",
+      "whenToUse": "When you want to walk through a UAT or Production release checklist item by item before a release ships — records a self-attested status and blocker/N/A note per item and produces a report. A self-attestation record, not an evidence audit; never blocks the release decision. Standalone on any repository",
+      "description": "Walk the engineer through a UAT Release Checklist or a Production Release Checklist item by item, one at a time, recording a self-attested status (Confirmed / Not confirmed / N/A) for every item — build integrity, test completion, security scans, database changes, deployment/rollback readiness, environment availability, and sign-offs — then produce a report. Standalone: works on any repository, with no other framework required. Use when the user wants a pre-release or production-release readiness check, or says \"run the release checklist\", \"release readiness check\", or similar.",
+      "discipline": "architect-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/architect-agents-store/release-readiness-checklist"
+    },
+    {
+      "name": "error-handling-audit",
+      "title": "Error Handling Audit",
+      "whenToUse": "When you want to inspect code for incorrect, missing, or poorly structured error handling — covers empty catch blocks, swallowed exceptions, missing async guards, lost error context, and unsafe cleanup patterns. Finds issues and applies fixes after approval",
+      "description": "Inspect code for incorrect, missing, or poorly structured error handling and apply optimizations. Covers empty catch blocks, swallowed exceptions, missing async error guards, lost error context, and unsafe cleanup patterns. Use when you want to audit error handling in an existing codebase or after adding new code that involves I/O, external calls, or async operations.",
+      "discipline": "coding-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/coding-agents-store/error-handling-audit"
+    },
+    {
+      "name": "runtime-debugger",
+      "title": "Runtime Debugger",
+      "whenToUse": "When you have a real bug in hand — debug logs, crash logs/stack traces, requirement docs, and/or your own observation of expected vs. actual behavior — and want help going from symptom to root cause to an approved fix",
+      "description": "Diagnose and fix bugs from real runtime evidence — debug logs, crash logs/stack traces, requirement or spec documents, and developer-reported observations. Correlates log evidence with the codebase to build ranked root-cause hypotheses, then applies an approved fix. Use when a developer has a reproducible or reported bug and wants help going from symptom (logs, crash, or \"it should do X but does Y\") to root cause to fix.",
+      "discipline": "coding-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/coding-agents-store/runtime-debugger"
+    },
+    {
+      "name": "observability-implementer",
+      "title": "Observability Implementer",
+      "whenToUse": "When you want to add or improve observability (logging, metrics, tracing) on a platform of your choice — OpenTelemetry, Datadog, New Relic, Grafana/Prometheus/Loki/Tempo, AWS CloudWatch/X-Ray, Elastic/ELK, Splunk, Honeycomb, Sentry, etc. Designs and implements structured logging with dynamic log-level switches, cardinality-safe metrics, sampled tracing, and explicit cost guardrails (volume budgets, alerts, kill-switches) to prevent excessive log/metric/trace volume and runaway cost",
+      "description": "Helps engineers design and implement observability — structured logging, metrics, and distributed tracing — in their application, on the observability platform of their choice (OpenTelemetry + any backend, Datadog, New Relic, Grafana/Prometheus/Loki/Tempo, AWS CloudWatch/X-Ray, Elastic/ELK, Splunk, Honeycomb, Sentry, or another). Brings production-grade best practices as opinionated defaults: dynamic log-level switches that don't require a redeploy, sampling and deduplication to prevent excessive log/metric/trace volume, PII/secret redaction, and explicit cost guardrails (volume budgets, alerts, kill-switches) sized to the engineer's constraints. Use when asked to \"add observability\", \"add logging/metrics/tracing\", \"instrument the app\", \"set up Datadog/New Relic/Grafana/OpenTelemetry\", or \"our logs are too noisy/expensive\".",
+      "discipline": "coding-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/coding-agents-store/observability-implementer"
+    },
+    {
+      "name": "auth-implementer",
+      "title": "Auth Implementer",
+      "whenToUse": "When you want to implement authentication (login/logout, SSO/OIDC/SAML, MFA, passwordless) and authorization (RBAC/ABAC, centralized access checks, IDOR prevention) with security as a first-class constraint. Designs and implements credential hashing, session/token strategy, account-abuse protection, and threat mitigations mapped to live-fetched OWASP ASVS / NIST 800-63B guidance and any named compliance framework (GDPR, HIPAA, PCI-DSS, SOC2) — while being explicit about what code alone can and can't guarantee, and recommending a follow-up scan (e.g. owasp-security-scanner) and audit for regulated contexts",
+      "description": "Helps engineers implement authentication and authorization with security and compliance treated as first-class design constraints, not an afterthought. Covers credential handling (Argon2id/bcrypt password hashing, breach/complexity checks), session and token strategy (secure cookies, JWT access/refresh rotation, revocation), MFA, account-lockout/brute-force protection, password-reset and email-verification flows, SSO/OIDC/SAML/social-login integration, and a centralized authorization layer (RBAC/ABAC, deny-by-default, IDOR/broken-object-level-authorization prevention). Fetches current OWASP ASVS and NIST 800-63B guidance live and maps every design decision to it, plus to any named regulatory framework (GDPR, HIPAA, PCI-DSS, SOC2) — while being explicit that this reduces risk and aligns with established controls rather than \"guaranteeing\" zero vulnerabilities or certifying compliance on its own. Recommends a follow-up scan (e.g. this repo's owasp-security-scanner agent) and, for regulated contexts, a professional security/compliance audit. Use when asked to \"add authentication\", \"add login/logout\", \"implement authorization\", \"add RBAC\", \"set up JWT/OAuth/OIDC/SAML\", \"add MFA\", \"secure our auth\", or \"make sure our login is compliant\".",
+      "discipline": "coding-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/coding-agents-store/auth-implementer"
+    },
+    {
+      "name": "code-cleanup",
+      "title": "Code Cleanup",
+      "whenToUse": "When you want to clean up an existing codebase—especially AI/vibe-coded ones—by removing waste, simplifying bulky code, and fixing evidenced quality, performance, or security issues while preserving required behavior. Default CLEAN finds one worthwhile cleanup at a time, proposes it, waits for approval, fixes, verifies, then continues; Analyze and Review only when explicitly requested. For a dedicated error-handling audit use error-handling-audit; for a full OWASP scan use owasp-security-scanner",
+      "description": "Clean up an existing codebase—especially AI/vibe-coded ones—by removing waste, simplifying bulky code, and fixing evidenced quality, performance, or security issues while preserving required behavior. Use when asked to clean/cleanup/ simplify/improve code quality, remove vibe code or unnecessary complexity, or run code-cleanup. Default CLEAN: find → propose → human approves → fix → verify → continue (one cleanup at a time). Analyze and Review only when explicitly requested. Not an audit-report generator. For a dedicated error-handling audit use error-handling-audit; for a full OWASP security scan use owasp-security-scanner — this skill only fixes evidenced issues it meets while cleaning.",
+      "discipline": "coding-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/coding-agents-store/code-cleanup"
+    },
+    {
+      "name": "owasp-security-scanner",
+      "title": "OWASP Security Scanner",
+      "whenToUse": "When you want a static code scan against OWASP Top 10 (2025) and/or OWASP Top 25 Parameters, with the latest standards fetched live from owasp.org. You choose which scan(s) to run; the agent reports severity-ranked findings with evidence — it does not edit code",
+      "description": "Static code analysis for OWASP Top 10 (2025) and OWASP Top 25 Parameters vulnerability classes. Fetches the latest standards from owasp.org at run time, lets the user pick which scan(s) to run, then greps/reads the codebase for matching defect patterns and produces a severity-ranked, evidence-based findings report. Read-only — never edits code. Use before a release, during a security review, or whenever you want a repo checked against current OWASP guidance.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/owasp-security-scanner"
+    },
+    {
+      "name": "black-box-testing",
+      "title": "Black-Box Testing",
+      "whenToUse": "When you want to design and execute functional tests against a live web app without source access — equivalence partitioning, boundary value analysis, decision tables, state transition, pairwise, and negative testing — then run them through Playwright",
+      "description": "Design and execute black-box functional tests against live web applications using Playwright. Use this agent whenever you want to test a web app's behavior without source access — designing test cases or running them in the browser. Trigger on black-box testing, test case design, test coverage, equivalence partitioning, boundary value analysis, decision tables, state transition testing, pairwise or combinatorial testing, negative testing, or \"test this form/page/flow\", \"write test cases for\", \"find bugs in\", \"check validation on\", or \"verify the behavior of\" a web app or feature. Also trigger when these tests should be driven through Playwright.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/black-box-testing"
+    },
+    {
+      "name": "white-box-testing",
+      "title": "White-Box Testing",
+      "whenToUse": "When you can run the code and want coverage-driven structural tests — statement/branch/condition/MC-DC, basis path, data flow, loop, and mutation testing — to improve coverage or assess an existing suite",
+      "description": "Design and execute white-box (structural) tests against a codebase you can run, using coverage analysis to drive test design. Use this agent whenever you want to test code from the inside — with knowledge of its internal structure — and have permission to run against the codebase. Trigger on white-box testing, structural testing, glass-box testing, code coverage, statement/branch/condition coverage, MC/DC, basis path testing, cyclomatic complexity, data flow testing, def-use chains, loop testing, or mutation testing, or \"improve test coverage\", \"write unit tests for\", \"find untested branches\", \"add tests to cover\", or \"assess my test suite\". Use it both to design tests that hit coverage targets and to measure and close coverage gaps.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/white-box-testing"
+    },
+    {
+      "name": "ui-ux-accessibility-testing",
+      "title": "UI/UX & Accessibility Testing",
+      "whenToUse": "When you want a design-parity audit against a design spec and/or a WCAG 2.2 AA accessibility audit (axe-core + Lighthouse + manual passes), producing a self-contained HTML report",
+      "description": "UI/UX parity + web accessibility (WCAG 2.2 AA) audit. Two tracks: (A) design-parity — compare a page against a provided design spec / design-system reference and report every visual and interaction deviation; (B) accessibility — audit any web app against WCAG 2.2 AA with axe-core + Lighthouse plus manual keyboard, screen-reader, contrast, reflow, target-size and reduced-motion passes. Use when asked to audit a page's design parity, check design-system consistency, run an accessibility/a11y/WCAG audit, test keyboard or screen-reader support, or check color contrast. Drives Chrome with playwright-cli, extracts computed styles, injects axe-core, and produces a self-contained HTML report.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/ui-ux-accessibility-testing"
+    },
+    {
+      "name": "test-cases-from-code",
+      "title": "Test Cases From Code",
+      "whenToUse": "When you must QA a feature branch with no spec, no reachable author, and no existing tests — reverse-engineer behavior as the oracle, check tenant/authorization isolation, reconcile stale test cases, and hand off a risk register (never confabulates intent)",
+      "description": "Build, update, and gap-fill software test cases by reverse-engineering behavior directly from a feature branch, for situations where domain knowledge, domain experts, and existing automated tests are all scarce or absent. Code-as-oracle discipline: it proves behavior-as-written (never correctness), keeps \"what it does\" separate from \"what it should do\", never confabulates intent, and treats behavior as conditional on the app's tenant/account, environment, feature-flag, and role axes. Use when you need to QA a feature branch whose author is unreachable, generate test scenarios from a service / API / app, reconcile outdated test cases against what the code actually does, check tenant/authorization isolation, or test a feature nobody fully understands. Trigger on \"create test cases from this branch\", \"our test cases are outdated\", \"fill the gaps in our test scenarios\", \"QA this branch\", \"test this feature without domain knowledge\", \"no one knows how this works\", or \"does this leak across tenants\". Works best with direct feature-branch access.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/test-cases-from-code"
+    },
+    {
+      "name": "smoke-sanity-testing",
+      "title": "Smoke & Sanity Testing",
+      "whenToUse": "When you want a fast go/no-go gate on a build — wide-and-shallow smoke across critical paths, or narrow-and-deep sanity on a changed area after a fix",
+      "description": "Run fast smoke and sanity checks on a web app to decide go/no-go before deeper testing or release. Use this agent whenever you want a quick confidence check on a build rather than thorough testing. Trigger on smoke testing, sanity testing, build verification (BVT), critical-path check, health check, post-deploy check, \"is this build stable\", \"is it safe to deploy\", \"quick check before we test\", \"did my fix work\", \"go/no-go\", or gating a build before fuller testing. Smoke = wide and shallow across critical paths on every build; sanity = narrow and deep on a changed area after a fix. Drives checks through Playwright and returns a clear pass/fail verdict.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/smoke-sanity-testing"
+    },
+    {
+      "name": "exploratory-testing",
+      "title": "Exploratory Testing",
+      "whenToUse": "When you want structured, charter-guided exploratory testing to find bugs scripted tests miss — tours, heuristics (SFDPOT/HICCUPPS), plus light accessibility and usability lenses",
+      "description": "Run structured exploratory testing of web apps — unscripted, charter-guided discovery that finds defects scripted tests miss, including accessibility and usability/UX issues. Use this agent whenever you want to explore an app for bugs without pre-written cases, or want to assess accessibility or UX. Trigger on exploratory testing, session-based testing, test charters, testing tours, heuristic evaluation, \"find bugs without a script\", \"poke around this app\", \"what's broken here\"; or accessibility, a11y, WCAG, keyboard navigation, screen reader, color contrast, focus order; or usability, UX testing, \"is this intuitive\", \"test the user experience\", \"does this match our design\". Drives exploration through Playwright and feeds findings back into scripted suites.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/exploratory-testing"
+    },
+    {
+      "name": "explore-and-build",
+      "title": "Explore & Build",
+      "whenToUse": "When you want to interactively explore a web app (agent-driven, Playwright Codegen, or Chrome DevTools Recorder) and turn the session into a test instruction file and a runnable Playwright spec",
+      "description": "Interactively explore a running web application with the user, then generate a test instruction file and a Playwright spec from what was discovered. Three modes — the agent drives the browser via a Playwright/browser MCP (guided), or the user drives while their actions are recorded via Playwright Codegen or the Chrome DevTools Recorder (no extension needed). Produces a Markdown instruction file and a runnable .spec.ts. Use when you want to turn a hands-on exploratory session into reusable automated tests for a feature or flow.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/explore-and-build"
+    },
+    {
+      "name": "bug-report",
+      "title": "Bug Report",
+      "whenToUse": "When you have annotated screenshots and want them turned into structured, copy-paste-ready bug reports — with an optional direct file into Jira via the Atlassian MCP",
+      "description": "Turn one or more annotated screenshots (arrows, text, comment bubbles, highlights taken in a markup tool like Greenshot) into a structured, copy-paste-ready bug report, save a Markdown audit copy, and optionally file the bug directly in Jira via the Atlassian MCP. Auto-groups screenshots into distinct bugs, reads the annotations as the bug narrative, and produces Summary / repro / expected / actual / severity in a consistent format. Use when a tester has marked up screenshots and wants them turned into proper bug reports or Jira issues.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/bug-report"
+    },
+    {
+      "name": "test-case-generator",
+      "title": "Test Case Generator",
+      "whenToUse": "When you want structured functional, edge, negative, and regression test cases generated from a feature spec, a git diff/PR, or both. Cases are grounded in the actual codebase and priority-ranked — it does not write or scaffold test code",
+      "description": "Generates structured functional, edge, negative, and regression test cases from a feature spec/requirement description and/or a git diff or PR. Grounds cases in actual code behavior by reading the relevant implementation, then produces a priority-ranked test-case report. Read-only — does not write or scaffold test code. Use when planning test coverage for a new feature, before writing tests for a PR, or when a QA/dev wants a structured test plan from a spec or ticket.",
+      "discipline": "qa-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/qa-agents-store/test-case-generator"
+    },
+    {
+      "name": "persona-builder",
+      "title": "Persona Builder",
+      "whenToUse": "Starting discovery on a client/product — generates evidence-grounded personas (or clearly-labelled proto-personas) from whatever research inputs exist",
+      "description": "Generates evidence-grounded user personas — or clearly-labelled proto-personas when no research exists — from whatever inputs are available (interview notes, transcripts, support tickets, analytics exports, stakeholder briefs). Use when starting client/product discovery, when asked \"who are the users\", or to build proto-personas before real research exists.",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/persona-builder"
+    },
+    {
+      "name": "journey-mapper",
+      "title": "Journey Mapper",
+      "whenToUse": "After a persona exists — maps their end-to-end journey through one scenario (actions, thoughts, emotions, pain points, opportunities)",
+      "description": "Maps one persona's end-to-end journey — stages, actions, thoughts, emotions, pain points, and opportunities — for a chosen scenario, grounded in whatever persona/research material exists. Trigger when asked to \"map the journey\", \"customer journey\", or \"what does the user experience end to end\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/journey-mapper"
+    },
+    {
+      "name": "service-blueprint",
+      "title": "Service Blueprint",
+      "whenToUse": "After a journey map exists — extends it below the line of visibility (frontstage/backstage/support processes/failure points)",
+      "description": "Extends a customer journey below the line of visibility — frontstage and backstage actions, support processes, evidence, and failure points for one scenario — turning a journey map into something operationally credible. Trigger when asked to \"blueprint the service\", \"what happens backstage\", or \"map the operations behind the journey\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/service-blueprint"
+    },
+    {
+      "name": "competitive-analysis",
+      "title": "Competitive Analysis",
+      "whenToUse": "Building the competitive picture for a pitch — competitor matrix, positioning, and differentiation opportunities from public research",
+      "description": "Builds a competitor matrix, positioning read, and differentiation opportunities from public research and any material supplied — public, verifiable information only. Trigger when asked to \"analyse the competitors\", \"competitive landscape\", or \"how do we position against X\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/competitive-analysis"
+    },
+    {
+      "name": "prototype-builder",
+      "title": "Prototype Builder",
+      "whenToUse": "Need something to click through — scaffolds a clickable Vite+React+Tailwind demo with mock data in an isolated folder",
+      "description": "Turns a brief plus whatever discovery material exists (personas, journey maps, service blueprints, competitive analysis) into a runnable, clickable Vite + React + Tailwind prototype with mock data — built into an isolated folder, never a real product or client repo. Trigger when asked to \"build a prototype\", \"clickable demo\", \"lovable-style mockup\", or \"something to click through\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/prototype-builder"
+    },
+    {
+      "name": "design-consistency-audit",
+      "title": "Design Consistency Audit",
+      "whenToUse": "Auditing a built UI against the project's own design tokens for theme/token/contrast/a11y/spacing/UX consistency, with a gated fix mode",
+      "description": "Audits a UI against the target project's own design tokens for theme/token/contrast/a11y/spacing/UX inconsistencies, surfacing evidence-backed findings with resolutions phrased in design-system terms. Two modes — detect (default, read-only) and fix (gated, writes code). Use when asked to \"review the design system\", \"check theme/token consistency\", \"audit the design\", or \"fix the design findings\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/design-consistency-audit"
+    },
+    {
+      "name": "design-concept-lab",
+      "title": "Design Concept Lab",
+      "whenToUse": "Need a few design directions for a screen or flow — generates distinct rendered mockup variants against the project's own tokens and stops for the engineer to pick one",
+      "description": "Generates 2-3 distinct, rendered design-concept variants for a screen or flow from a written requirement and the project's own design tokens, assembles them into a showcase gallery, and stops for the engineer to approve one direction. Use when asked to \"design this screen\", \"give me a few design concepts\", \"make a more elegant design\", or \"showcase design options\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/design-concept-lab"
+    },
+    {
+      "name": "ixd-review",
+      "title": "IxD Review",
+      "whenToUse": "Heuristic interaction-design review of a product, flow, or prototype from screenshots, files, or a live URL — evidence-backed, prioritised recommendations",
+      "description": "Runs a heuristic interaction-design review of a product, flow, or prototype — from screenshots, files, or a live URL — evaluating against IxD heuristics (visibility, feedback, error recovery, consistency, efficiency) and producing prioritised, evidence-backed recommendations. Trigger when asked to \"review the interaction design\", \"UX heuristic review\", or \"critique this flow\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/ixd-review"
+    },
+    {
+      "name": "design-rationale",
+      "title": "Design Rationale",
+      "whenToUse": "After design-consistency-audit findings are resolved — turns them into a factual, customer-facing Design Decision Record",
+      "description": "Turns resolved design-consistency findings into a factual, customer-facing Design Decision Record — the justification for design choices in terms of consistency, WCAG conformance, and design-system adherence. Trigger when asked to \"document the design decisions\", \"write the design rationale\", or \"justify the design changes for the customer\".",
+      "discipline": "ux-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/ux-agents-store/design-rationale"
+    },
+    {
+      "name": "explore-agentic-ai-usecases",
+      "title": "Explore Agentic AI Use Cases",
+      "whenToUse": "Mining an existing product codebase for agentic AI opportunities — minimal targeted questions, then a business-reader report (problem, value, solution, spec, man-day estimate) sorted with high-value / low-effort use cases first",
+      "description": "Derives potential agentic AI use cases for an existing product by analysing its codebase (single repo or a multi-repo estate checked out side by side) and asking the user a bare minimum of targeted questions, then writes a business-reader-facing Markdown report — problem, business value, solution, high-level spec, and man-day estimate per use case — sorted so high-value / low-effort candidates come first. Use when asked to \"find agentic AI use cases\", \"where could agents help in this product\", \"explore AI opportunities in this codebase\", or at the start of an agentic pre-sales conversation.",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/explore-agentic-ai-usecases"
+    },
+    {
+      "name": "ai-readiness-assessment",
+      "title": "AI Readiness Assessment",
+      "whenToUse": "Before any AI project — a short, low-cost assessment that researches the client's industry, competitors, candidate AI opportunities, and regulatory exposure on the web, then scores data quality and security, domain-knowledge capture, and organisational capability (including AI governance and evaluation) against them, producing a business-reader report with domain model, scorecard, prioritised readiness roadmap, and recommended next steps",
+      "description": "Assesses how AI-ready an organisation is across three dimensions — data quality and security, domain knowledge capture, and organisational capability including AI governance and evaluation — after researching its industry, competitors, candidate AI opportunities and regulatory exposure on the web. Combines that research with a short targeted interview and optional read-only sampling of provided data, then writes a business-reader report (domain model, competitor landscape, future AI opportunities with risk tier, readiness scorecard, prioritised low-cost roadmap, re-assessment trigger, next engagement steps). Use when asked to \"assess AI readiness\", \"is our/the client's data ready for AI\", \"make client data and domain expertise AI-ready\", \"what AI opportunities and competitors should we consider\", or at the start of a short, low-cost pre-engagement before any AI project is scoped.",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/ai-readiness-assessment"
+    },
+    {
+      "name": "discovery-interview",
+      "title": "Discovery Interview",
+      "whenToUse": "Starting a new engagement or opportunity — a Socratic, one-question-at-a-time interview that resolves ambiguity before any scoping happens",
+      "description": "Conducts a one-question-at-a-time Socratic interview with a prospect/stakeholder to resolve ambiguity and probe business value, current process, scale, risk, and compliance before any scoping happens. Use when asked to \"run a discovery interview\", \"grill me on this\", or before scoping a new engagement/opportunity.",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/discovery-interview"
+    },
+    {
+      "name": "elaborate",
+      "title": "Elaborate",
+      "whenToUse": "Turning a loose request into a clear, codebase-grounded requirement and scope spec before any implementation plan is written",
+      "description": "Turns a loose request into a clear, codebase-grounded requirement and scope spec — intent, scenarios, in/out-of-scope, affected areas, candidate acceptance criteria, and open questions — before any implementation plan is written. Use when asked to \"clarify the requirement\", \"what's the scope\", \"analyse this request\", or when a request is vague before planning.",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/elaborate"
+    },
+    {
+      "name": "estimate",
+      "title": "Estimate",
+      "whenToUse": "Building a 3-point (PERT) effort estimate from a requirement spec, with a client-ready estimation sheet",
+      "description": "Builds a 3-point (PERT) effort estimate from a requirement spec, independent of any implementation, and renders a client-facing estimation sheet with assumptions and notes. Use when asked to \"estimate this\", \"how long will it take\", \"give the client an estimate\", \"3-point estimate\", or \"ballpark the effort\".",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/estimate"
+    },
+    {
+      "name": "proposal",
+      "title": "Proposal",
+      "whenToUse": "Assembling a client-facing proposal from whatever discovery, spec, and estimate material exists",
+      "description": "Assembles a client-facing proposal from whatever discovery, spec, and estimate material exists — executive summary, objectives, approach, scope, timeline, and pricing — grounded in real inputs with honest placeholders for what's missing. Use when asked to \"build a proposal\", \"write the client proposal\", or \"put together a proposal document\".",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/proposal"
+    },
+    {
+      "name": "casestudy-drafter",
+      "title": "Case Study Drafter",
+      "whenToUse": "Turning a delivered codebase (single repo or multi-repo estate) into industry-class customer case studies — analyses the domain and user journeys, proposes candidate angles (flagging which need customer metrics), narrows them down with minimal structured questions, and writes one Markdown case study per selection (synopsis, problem domain, solution with optional high-level technical approach, impact), named or anonymized per run, with a post-write revise step",
+      "description": "Drafts an industry-class customer case study from an existing codebase (single repo or a multi-repo estate checked out side by side). Analyses the code to understand the domain, user journeys, and distinctive engineering work, proposes candidate case-study angles (flagging which stand alone without customer metrics), narrows them down with the user via a bare minimum of targeted questions with structured impact capture, then writes one Markdown case study per selected candidate — synopsis, problem domain, solution (optionally with a high-level technical approach for technical buyers), and impact — named <project>-<casestudy>.md, with a post-write revise step for user-directed edits. Use when asked to \"draft a case study from this codebase\", \"create a success story for this project\", \"produce customer-story collateral\", or at the end of an engagement when pre-sales assets are being prepared.",
+      "discipline": "pre-sales-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/pre-sales-agents-store/casestudy-drafter"
+    },
+    {
+      "name": "repo-analyst",
+      "title": "Repo Analyst",
+      "whenToUse": "Onboarding into an unfamiliar data platform, or starting any analysis pipeline — builds a structured knowledge graph of schema, pipelines, and lineage, cross-referenced against documentation",
+      "description": "Deeply inventories a data platform repository — and, optionally, its live warehouse — into a structured knowledge-graph document covering schema, pipelines, data lineage, and gaps between documentation and reality. Read-only. Use before onboarding into an unfamiliar data platform, or as the first step of any data-platform analysis pipeline.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/repo-analyst"
+    },
+    {
+      "name": "due-diligence",
+      "title": "Due Diligence",
+      "whenToUse": "Periodic health audit, or onboarding into an unfamiliar data platform — audits security & access, data quality & integrity, GDPR & compliance, pipeline reliability, and architecture consistency, producing evidence-backed findings with severity. Read-only",
+      "description": "Audits a data platform across five pillars — security & access, data quality & integrity, GDPR & compliance, pipeline reliability, and architecture consistency — producing evidence-backed findings with severity. Read-only, never proposes or applies fixes. Use for a periodic health audit, or before onboarding into an unfamiliar data platform.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/due-diligence"
+    },
+    {
+      "name": "architecture-advisor",
+      "title": "Architecture Advisor",
+      "whenToUse": "After a due-diligence audit surfaces architectural or structural problems — proposes formal Architecture Decision Records (ADRs) applying data-engineering best practices. Read-only, never implements",
+      "description": "Takes due-diligence findings for a data platform and proposes formal Architecture Decision Records (ADRs) applying data-engineering best practices. Read-only — proposes solutions, never implements them. Use after a due-diligence audit surfaces architectural or structural problems that need a formal decision.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/architecture-advisor"
+    },
+    {
+      "name": "opportunity-scout",
+      "title": "Opportunity Scout",
+      "whenToUse": "Scoping what to build next on a data platform, after due-diligence/architecture work — compares business/BI requirements against the current schema to identify missing views, fact tables, and dimensions, and turns gaps into a prioritised backlog. Read-only",
+      "description": "Compares business requirements and BI needs against a data platform's current schema, identifying missing analytical views, fact tables, and dimensions, and turns the gap into a prioritised development backlog. Read-only — never creates schema itself. Use after due-diligence/architecture work, when scoping what to build next on a data platform.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/opportunity-scout"
+    },
+    {
+      "name": "data-platform-developer",
+      "title": "Data Platform Developer",
+      "whenToUse": "Implementing one approved opportunity or ADR end to end — creates or changes schema and pipeline code with human checkpoints and mandatory idempotency",
+      "description": "Implements one approved data-platform opportunity or Architecture Decision Record end to end, creating or changing schema and pipeline code exactly as specified. Write-capable, but gated by human checkpoints and idempotency requirements. Use after opportunity-scout or architecture-advisor has produced an approved item to build.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/data-platform-developer"
+    },
+    {
+      "name": "data-platform-validator",
+      "title": "Data Platform Validator",
+      "whenToUse": "Independently reviewing a completed data-platform change against its approved opportunity or ADR before merge, with evidence-backed approve/reject findings",
+      "description": "Independently reviews an implemented data-platform change against its approved opportunity or Architecture Decision Record, checking execution completeness, schema/architecture conformance, security, idempotency, and quality. Read-only except for writing the requested review report.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/data-platform-validator"
+    },
+    {
+      "name": "regression-monitor",
+      "title": "Regression Monitor",
+      "whenToUse": "Periodically comparing current platform state against an established baseline to report schema drift, undocumented pipeline changes, and data-quality degradation",
+      "description": "Compares current data-platform state against an established baseline to detect schema drift, undocumented pipeline changes, and data-quality degradation. Read-only; writes a categorized regression report to a user-specified file.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/regression-monitor"
+    },
+    {
+      "name": "context-keeper",
+      "title": "Context Keeper",
+      "whenToUse": "Closing out a completed data-platform work cycle with a plain-language summary of what changed, current state, open follow-ups, and recommended next steps",
+      "description": "Closes out a completed data-platform work cycle by writing a plain-language summary of what changed, the current platform state, and recommended next steps. Writes only one user-specified summary file; no DB or agents/context maintenance.",
+      "discipline": "data-platform-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/data-platform-agents-store/context-keeper"
+    },
+    {
+      "name": "eu-ai-act-controls-reviewer",
+      "title": "EU AI Act Controls Reviewer",
+      "whenToUse": "When you want to review an agentic-AI code repository for fitness against the EU AI Act, with every requirement cross-mapped to ISO/IEC 42001 Annex A controls and the NIST AI RMF functions. Determines the likely EU AI Act risk tier, assesses each obligation verifiable from code/config/prompts/IaC/CI/tests, flags organisational and legal items for a human, and writes a single Markdown fitness report. Read-only. A control-fitness and gap-analysis aid — not legal advice or a formal conformity assessment",
+      "description": "Review an agentic-AI code repository for fitness against the EU AI Act, with every requirement cross-mapped to ISO/IEC 42001 Annex A controls and the NIST AI RMF functions. Determines the likely EU AI Act risk tier, assesses each obligation that is verifiable from source code, config, prompts, IaC, CI, and tests, flags organisational/legal items for a human, and writes a single Markdown compliance-fitness report with the ISO 42001 and NIST mappings. Strictly read-only — never modifies code. This is a control-fitness and gap-analysis aid, not legal advice or a formal conformity assessment. Use before a go-live governance review, for an AI-management-system (ISO 42001) gap analysis, or to prepare EU AI Act evidence.",
+      "discipline": "compliance-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/compliance-agents-store/eu-ai-act-controls-reviewer"
+    },
+    {
+      "name": "gdpr-controls-reviewer",
+      "title": "GDPR Controls Reviewer",
+      "whenToUse": "When you want to review a repository that processes personal data — with extra depth for AI/LLM and agentic systems — for fitness against the EU GDPR, with every requirement cross-mapped to ISO/IEC 27701 and the NIST Privacy Framework. Builds a personal-data inventory (incl. special-category data and flows to LLM providers and other third parties), determines controller/processor role, assesses data-subject rights, retention, minimisation, privacy by default, security, transfers and automated decision-making from code/config/prompts/IaC/CI/tests, tags each gap with fine tier and exposure, flags organisational and legal items for a human, and writes a single Markdown fitness report. Use before go-live or a DPIA, or when adding an LLM provider or new personal-data flow. Read-only. A control-fitness and gap-analysis aid — not legal advice or a DPIA",
+      "description": "Review a code repository that processes personal data — with extra depth for AI/LLM and agentic systems — for fitness against the EU GDPR, with every requirement cross-mapped to ISO/IEC 27701 privacy controls and the NIST Privacy Framework. Builds a personal-data inventory (PII fields, special-category data, stores, flows to LLM providers and other third parties), determines controller/processor role, assesses each obligation that is verifiable from source code, config, prompts, IaC, CI, and tests (data-subject rights, retention, minimisation, privacy by default, security, transfers, automated decision-making), flags organisational/legal items for a human, and writes a single Markdown GDPR fitness report tagged with fine tier and exposure. Strictly read-only — never modifies code. A control-fitness and gap-analysis aid, not legal advice or a DPIA. Use before go-live or a DPIA, for an ISO 27701 / privacy-programme gap analysis, when adding an LLM provider or new personal-data flow, or to prepare GDPR accountability evidence. For EU AI Act obligations use eu-ai-act-controls-reviewer instead.",
+      "discipline": "compliance-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/compliance-agents-store/gdpr-controls-reviewer"
+    },
+    {
+      "name": "delivery-commitment-health-report",
+      "title": "Delivery Commitment Health Report",
+      "whenToUse": "At a sprint/bolt boundary, or whenever a delivery manager or customer wants a data-backed delivery snapshot — produces a DORA-inspired report (deployment/merge frequency, decomposed lead time, change failure rate, MTTR, commitment reliability) adapted for AI-led development, where AI-generation time and human-review time are tracked separately. Read-only",
+      "description": "Produces a DORA-inspired delivery health report — deployment/merge frequency, decomposed lead time, change failure rate, MTTR, and commitment reliability — adapted for AI-led development, where AI-generation time and human-review time are tracked separately. Read-only; works from git history plus an optional backlog/board export, regardless of whether the team runs Scrum sprints, Kanban, or AI-DLC bolts. Invoke at a sprint/bolt boundary, or whenever delivery managers or customers want a data-backed delivery health snapshot.",
+      "discipline": "delivery-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/delivery-agents-store/delivery-commitment-health-report"
+    },
+    {
+      "name": "planning-helper-agent",
+      "title": "Planning Helper",
+      "whenToUse": "When an engineer wants to parallelize work — either DECOMPOSE one task/epic into the smallest independently-executable subtasks, or SCHEDULE a set of existing tasks — by mapping inter-dependencies and grouping the work into parallel execution waves. Produces a dependency graph, wave-by-wave plan, and the critical path. Read-only for source",
+      "description": "Helps engineers parallelize work by mapping inter-dependencies. Operates in two modes — DECOMPOSE (break one large task into the smallest independently-executable subtasks) and SCHEDULE (take a set of existing tasks, infer their dependencies, and group them into parallel execution waves). Produces a dependency graph, a wave-by-wave execution plan, and the critical path so a team (or a set of parallel agents) knows exactly what can run at the same time. Read-only for source; writes only the plan file agreed upfront.",
+      "discipline": "delivery-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/delivery-agents-store/planning-helper-agent"
+    },
+    {
+      "name": "user-intent-extractor",
+      "title": "User Intent Extractor",
+      "whenToUse": "When building an in-app AI assistant, a \"tell us what you need\" entry point, smart onboarding, or any surface that should map a user's intent (via chat or generated action buttons) to the product's real features/services and offer the best fit — like a salesperson — instead of routing them through a fixed UI flow. Discovers the offering catalog and designs/implements three grounding layers: the offering registry, a per-user preference memory, and a curated cross-user plot library (the recurring intent-journeys the product sees over time), feeding an embedding-similarity matching pipeline with preference/plot-aware ranking",
+      "description": "Helps engineers design and implement an AI-driven \"digital sales assistant\" capability inside their own product — one that lets a user state what they want, via chat or by tapping generated action buttons, and have the app respond the way a good salesperson would, by matching that intent against the product's real features/services and offering the best fit, instead of routing the user through a fixed UI flow. Discovers the target solution's offering catalog (from code, plus optional supplementary docs), then designs and implements three layers that ground and improve the matching over time: the offering registry (what the product can sell), a per-user preference memory (what this user tends to want), and a curated plot library (the small, recurring set of intent-journeys the product sees across all users, used to bootstrap strong first offers instead of a cold start). Use when building an in-app assistant, a \"tell us what you need\" entry point, smart onboarding, or any surface meant to behave like a helpful salesperson rather than a rigid menu or wizard.",
+      "discipline": "feature-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/feature-agents-store/user-intent-extractor"
+    },
+    {
+      "name": "requirement-analyzer",
+      "title": "Requirement Analyzer",
+      "whenToUse": "When a requirement or stated intent needs to be critically evaluated before it's scoped or built. Applies the Paul-Elder Critical Thinking Framework — deconstructs the requirement into its Elements of Reasoning, stress-tests each against the nine Essential Intellectual Standards, then uses the seven Intellectual Traits as a reflective pass to catch blind spots — surfacing hidden assumptions, missing viewpoints, logical gaps, and clarifying questions for the requirement's owner",
+      "description": "Applies the Paul-Elder Critical Thinking Framework to a given requirement or stated intent — deconstructing it into its Elements of Reasoning (purpose, question at issue, information, interpretation/inference, concepts, assumptions, implications/consequences, point of view), stress-testing each against the nine Essential Intellectual Standards (clarity, accuracy, precision, relevance, depth, breadth, logic, significance, fairness), then using the seven Intellectual Traits (humility, courage, empathy, integrity, perseverance, confidence in reason, fair-mindedness) as a reflective pass to catch the analyst's own blind spots. Surfaces hidden assumptions, missing viewpoints, logical gaps, and unresolved ambiguity as concrete clarifying questions before a requirement is scoped or built. Use when asked to \"critically evaluate this requirement\", \"stress-test this intent\", \"what am I missing in this ask\", \"sanity-check this before we build it\", or before handing a requirement to scoping/elaboration or implementation planning.",
+      "discipline": "analyst-agents-store",
+      "source": "https://github.com/xianix-team/ide-expert-agents/tree/main/analyst-agents-store/requirement-analyzer"
+    }
+  ]
+}

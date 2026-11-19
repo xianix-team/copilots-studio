@@ -1,0 +1,365 @@
+{
+  "repo": "xianix-team/ai-dlc-base",
+  "url": "https://github.com/xianix-team/ai-dlc-base",
+  "commit": "f114556",
+  "date": "2026-11-16",
+  "skills": [
+    {
+      "name": "product-engineering-essentials",
+      "title": "Product Engineering Essentials",
+      "category": "Product & Engineering Foundations",
+      "classification": "standalone",
+      "summary": "Checks how much foundational product-engineering groundwork the repository actually has in place, across ten pillars: product vision & problem definition, user & domain understanding, product requirements & scope, UX/product design foundation, architecture & technical foundation, development standards & engineering practices, DevOps & environment foundation, quality engineering foundation, security/compliance & operational readiness, and the product delivery & feedback loop. Reads the real repository — docs, CI config, infra, test structure, whatever exists — and marks each item In place / Partial / Missing / N/A with evidence, never inferring a status from a file's mere existence. Produces a checklist report, not a score, since the pillars are not equally weighted or equally urgent for every project. Not a gate — nothing blocks on it; it exists purely to make gaps visible so a team chooses deliberately rather than by accident.",
+      "whenToInvoke": "any time the team wants a shared, evidence-based picture of what foundational product/engineering artifacts exist and which are missing — often useful early, but equally useful mid-project as a sanity check before scaling up",
+      "howToInvoke": "Read process-onboarding-agent/skills/product-engineering-essentials.md and run the essentials check on this repository.",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/product-engineering-essentials.md"
+    },
+    {
+      "name": "solution-shaping",
+      "title": "Solution Shaping",
+      "category": "Planning & Design",
+      "classification": "standalone",
+      "summary": "Decides the shape of a solution before any design work begins: generic capability or feature-specific implementation, expected usage and scale, the simplest viable approach, extend-vs-build-vs-buy, and how reversible the choice is. The signed-off decision is recorded on the feature brief and constrains the design session that follows — so over-engineering and accidental platform-building are caught before any contract is drawn.",
+      "whenToInvoke": "when a high-level feature request lands, before running a design session or breaking work into tasks",
+      "howToInvoke": "Read process-onboarding-agent/skills/solution-shaping.md and shape the solution for [feature name].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/solution-shaping.md"
+    },
+    {
+      "name": "design-session",
+      "title": "Design Session",
+      "category": "Planning & Design",
+      "classification": "standalone",
+      "summary": "Runs a structured Phase 0 design session before any building begins. Locks down API contracts, data model decisions, and architectural patterns through conversation, then produces a design artifact the team can reference during build.",
+      "whenToInvoke": "at the start of planning a new feature, before breaking it into tasks",
+      "howToInvoke": "Read process-onboarding-agent/skills/design-session.md and run a design session for [feature name].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/design-session.md"
+    },
+    {
+      "name": "bolt-risk-assessment",
+      "title": "Risk Assessment",
+      "category": "Planning & Design",
+      "classification": "standalone",
+      "summary": "Runs a structured risk assessment before a batch of work executes. Interrogates blast radius, cross-component risks, rollback options, and whether a feature flag is warranted.",
+      "whenToInvoke": "before starting a sizeable feature, refactor, or infrastructure change",
+      "howToInvoke": "Read process-onboarding-agent/skills/bolt-risk-assessment.md and run a risk assessment for [work description].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/bolt-risk-assessment.md"
+    },
+    {
+      "name": "uat",
+      "title": "UAT Sign-off",
+      "category": "Quality & Acceptance",
+      "classification": "standalone",
+      "summary": "Generates a plain-language UAT demo script from a set of acceptance criteria, walks the engineer through each step, and records pass/fail/deferred outcomes. Blocks closure of a feature until a sign-off status is recorded.",
+      "whenToInvoke": "when a feature is complete and ready for acceptance testing with the stakeholder or product owner",
+      "howToInvoke": "Read process-onboarding-agent/skills/uat.md and run a UAT session for [feature name] using these acceptance criteria: [paste ACs].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/uat.md"
+    },
+    {
+      "name": "release-readiness-checklist",
+      "title": "Release Readiness Checklist",
+      "category": "Quality & Acceptance",
+      "classification": "standalone",
+      "summary": "Walks the engineer through the UAT Release Checklist or the Production Release Checklist, one item at a time, before a release ships. Records Confirmed / Not confirmed / N/A for every item, captures a blocker note for anything not confirmed, and closes with a full readiness report. Not an evidence audit — unlike Product Engineering Essentials, it never inspects the repository, CI logs, or any other artifact; it is a pure self-attestation record. It never gates or authorizes the release either — that decision stays with whoever holds sign-off (technical owner, QA, security, product, operations, as applicable).",
+      "whenToInvoke": "before deploying a build to a UAT environment, and again before a production release",
+      "howToInvoke": "Read process-onboarding-agent/skills/release-readiness-checklist.md and run the [UAT|Production] release checklist for [version/build].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/release-readiness-checklist.md"
+    },
+    {
+      "name": "root-cause-analysis",
+      "title": "Root Cause Analysis",
+      "category": "Incident & Root Cause",
+      "classification": "standalone",
+      "summary": "Applies structured 5-Whys analysis to a resolved incident or recurring problem. Classifies the root cause as Solution Design, Technology Selection, or Process, and proposes concrete remediation actions.",
+      "whenToInvoke": "after a production incident is resolved, or when a pattern of recurring bugs is noticed",
+      "howToInvoke": "Read process-onboarding-agent/skills/root-cause-analysis.md and run a root cause analysis on [incident description].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/root-cause-analysis.md"
+    },
+    {
+      "name": "hotfix-bolt",
+      "title": "Hotfix Workflow",
+      "category": "Incident & Root Cause",
+      "classification": "needs-config",
+      "summary": "Runs an emergency intake for a production incident: three questions (symptom, severity, rollback availability), a minimal unit of work, blast radius check, and a mandatory retro within 24 hours.",
+      "whenToInvoke": "when a production incident needs an immediate response",
+      "howToInvoke": "Read process-onboarding-agent/skills/hotfix-bolt.md and start a hotfix for [symptom].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/hotfix-bolt.md"
+    },
+    {
+      "name": "process-visualization",
+      "title": "Process Visualization",
+      "category": "Retrospective & Review",
+      "classification": "needs-config",
+      "summary": "Reconstructs how a batch of work actually got delivered — not the plan, but what really happened — and renders it as Mermaid diagrams: an actual delivery timeline and an actual execution path, plus a plan-vs-actual deviation table. Mines git history for real status-change dates when the project is a git repo; falls back to whatever dates are recorded in your own artifacts otherwise, and says plainly which mode it used.",
+      "whenToInvoke": "at the start of a retrospective, before discussing what went well — or any time you want a factual reconstruction of how a piece of work actually unfolded",
+      "howToInvoke": "Read process-onboarding-agent/skills/process-visualization.md and visualize how [bolt/feature name] actually went.",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/process-visualization.md"
+    },
+    {
+      "name": "progress-digest",
+      "title": "Progress Digest",
+      "category": "Communication & Reporting",
+      "classification": "standalone",
+      "summary": "Generates a plain-language, one-page progress summary for a feature — written for non-technical stakeholders. Translates the current state of a feature into what is being built, what is done, and what comes next.",
+      "whenToInvoke": "when a stakeholder update is needed, or before a sprint review",
+      "howToInvoke": "Read process-onboarding-agent/skills/progress-digest.md and generate a progress digest for [feature name]. Here is the current state: [describe or paste context].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/progress-digest.md"
+    },
+    {
+      "name": "knowledge-promotion",
+      "title": "Knowledge Promotion",
+      "category": "Communication & Reporting",
+      "classification": "standalone",
+      "summary": "Evaluates improvements or learnings from a retro or incident and classifies each as generic (shareable across teams) or project-specific (keep local). For generic improvements, drafts the exact change needed in shared resources so the engineer can raise it with the wider team or guild.",
+      "whenToInvoke": "at the end of a retrospective, after applying improvements",
+      "howToInvoke": "Read process-onboarding-agent/skills/knowledge-promotion.md and run knowledge promotion on these retro improvements: [paste improvements].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/knowledge-promotion.md"
+    },
+    {
+      "name": "notifications",
+      "title": "Notifications",
+      "category": "Communication & Reporting",
+      "classification": "needs-config",
+      "summary": "Sends Slack alerts at the delivery moments that need a human — sign-off required, work complete, incident, repeated failure. A local, per-engineer setup: your own channel, your own webhook, your own machine, notifying you about your own sessions — not a team broadcast. Two layers: deterministic tool hooks that ping every time the agent stops or needs attention — supported on Claude Code, Cursor and Copilot, each with its own config file — and agent-driven, event-specific notifications you can wire into any process.",
+      "whenToInvoke": "when you want to be pinged instead of watching a session — e.g. long-running work, async review, or on-call",
+      "howToInvoke": "Read process-onboarding-agent/skills/notifications.md and send a notification: [message].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/notifications.md"
+    },
+    {
+      "name": "ai-hub-metrics",
+      "title": "AI Hub Metrics",
+      "category": "Observability & Metrics",
+      "classification": "needs-config",
+      "summary": "Pushes usage and activity events to 99x AI Hub at delivery moments that mark real progress — attributing each event to the actors who did the work (human, AI, or both) and, when tracked separately, tokens/cost/model. This is a project-wide integration (one Team, one Workflow, one shared credential in AI Hub), not a per-engineer setup like notifications.",
+      "whenToInvoke": "when the team wants AI-assisted delivery work visible in a shared usage dashboard — tokens, cost, model, and who participated, across the team",
+      "howToInvoke": "Read process-onboarding-agent/skills/ai-hub-metrics.md and push an AI Hub event for [unit/bolt/intent].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/ai-hub-metrics.md"
+    },
+    {
+      "name": "dependency-audit",
+      "title": "Dependency Audit",
+      "category": "Maintenance & Health",
+      "classification": "needs-config",
+      "summary": "Reads package manifests, classifies findings by severity (critical / high / medium / low), and produces a remediation list with suggested actions for high and critical issues.",
+      "whenToInvoke": "monthly, or before a release, or whenever a security advisory is published for a dependency you use",
+      "howToInvoke": "Read process-onboarding-agent/skills/dependency-audit.md and run a dependency audit on this project.",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/dependency-audit.md"
+    },
+    {
+      "name": "compact-docs",
+      "title": "Compact Docs",
+      "category": "Maintenance & Health",
+      "classification": "needs-config",
+      "summary": "Archives operational documents older than a configured threshold — keeping the active workspace clean without losing institutional memory.",
+      "whenToInvoke": "when your process documents folder has grown large and is hard to navigate, or at a cadence your team sets (e.g., end of each sprint)",
+      "howToInvoke": "Read process-onboarding-agent/skills/compact-docs.md and archive documents older than [N] days in [folder path].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/compact-docs.md"
+    },
+    {
+      "name": "process-health",
+      "title": "Process Health",
+      "category": "Maintenance & Health",
+      "classification": "needs-config",
+      "summary": "Computes four process health metrics — improvement adoption rate, quality gate failure rate, AC revision rate, and bolt velocity — and surfaces decay signals. Saves a dated health report automatically.",
+      "whenToInvoke": "periodically (e.g., every few sprints) to check whether process discipline is holding or drifting",
+      "howToInvoke": "Read process-onboarding-agent/skills/process-health.md and run a process health check. The project is [project name] and our process artifacts are at [folder path].",
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/process-health.md"
+    },
+    {
+      "name": "new-engineer-induction",
+      "title": "New Engineer Induction",
+      "category": "New Team Members",
+      "classification": "framework-only",
+      "summary": "Walks a new team member through the project's governance framework, explains each section in plain language, demonstrates the quality gate with a project-specific example, and produces a personalized quick-reference card.",
+      "whenToInvoke": null,
+      "howToInvoke": null,
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/new-engineer-induction.md"
+    },
+    {
+      "name": "governance-map",
+      "title": "Governance Map",
+      "category": "New Team Members",
+      "classification": "framework-only",
+      "summary": "Draws a one-page map of how the installed framework governs delivery — the governance layer, each phase's steps, every sign-off gate, the bolt variants and the feedback loops — built only from the project's own framework files, as a Mermaid Markdown file and a self-contained HTML blueprint.",
+      "whenToInvoke": null,
+      "howToInvoke": null,
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/governance-map.md"
+    },
+    {
+      "name": "bug-bolt",
+      "title": "Bug Bolt",
+      "category": "Workflow Shortcuts",
+      "classification": "framework-only",
+      "summary": "Lightweight workflow for fixing a specific, reproducible bug — four-question intake, recurrence check, single focused unit, mandatory RCA if recurring.",
+      "whenToInvoke": null,
+      "howToInvoke": null,
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/bug-bolt.md"
+    },
+    {
+      "name": "nfr-bolt",
+      "title": "NFR Bolt",
+      "category": "Workflow Shortcuts",
+      "classification": "framework-only",
+      "summary": "Non-functional improvement workflow — measurable threshold AC, before/after baseline, cross-reference to affected features.",
+      "whenToInvoke": null,
+      "howToInvoke": null,
+      "source": "https://github.com/xianix-team/ai-dlc-base/blob/main/repository-agents/process-onboarding-agent/skills/nfr-bolt.md"
+    }
+  ],
+  "agents": [
+    {
+      "name": "Onboarding",
+      "does": "Installs the 99x Intent Delivery Framework through a structured interview or codebase archaeology session",
+      "entryPoint": "process-onboarding-agent/onboard.md"
+    },
+    {
+      "name": "Experience",
+      "does": "Governs AI behavior on every working session — quality gates, elaboration, bolts, retros, UAT",
+      "entryPoint": "Master rule file (auto-loaded at session start)"
+    },
+    {
+      "name": "Diagnostics",
+      "does": "Audits process against AI-DLC principles and delivers a structured gap report — works with or without the framework installed",
+      "entryPoint": "process-diagnostic-agent/role-play.md"
+    },
+    {
+      "name": "Skills",
+      "does": "Installs individual framework skills into a bespoke delivery process without installing the full framework",
+      "entryPoint": "process-skills-agent/onboard.md"
+    },
+    {
+      "name": "Migration",
+      "does": "Migrates a project from the old ai-dlc/ structure to the new methodology",
+      "entryPoint": "process-migration-agent/migrate.md"
+    },
+    {
+      "name": "Estimation",
+      "does": "Produces structured estimates — ballpark ranges from draft requirements (pre-sales/feasibility) or bolt-level delivery estimates from elaborated units (release planning)",
+      "entryPoint": "process-estimation-agent/estimate.md"
+    }
+  ],
+  "phases": [
+    {
+      "phase": 1,
+      "title": "Easy wins: add AI to what you already do",
+      "intro": "No process change required. These activities slot into existing ceremonies and produce immediate, visible output.",
+      "activities": [
+        {
+          "n": 1,
+          "activity": "Meeting → stories and tasks",
+          "does": "Turns a planning or discovery transcript into draft stories, tasks, and open questions.",
+          "buildsToward": "Intent capture"
+        },
+        {
+          "n": 2,
+          "activity": "Story polish",
+          "does": "Rewrites a rough story in intent style — what it is, why it matters, and what success looks like.",
+          "buildsToward": "Intent-style tickets"
+        },
+        {
+          "n": 3,
+          "activity": "AC and NFR enhancement",
+          "does": "Expands a story into testable acceptance criteria plus non-functional requirements: performance, security, accessibility, and observability.",
+          "buildsToward": "Testable ACs"
+        },
+        {
+          "n": 4,
+          "activity": "Status digest",
+          "does": "Turns ticket moves and commits into a plain-language stakeholder update.",
+          "buildsToward": "progress-digest skill"
+        },
+        {
+          "n": 5,
+          "activity": "PR summarizer",
+          "does": "Writes the \"what changed and why\" on each pull request so reviewers start faster and with full context.",
+          "buildsToward": "Build hygiene"
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "title": "Strengthen the ceremony: AI adds judgment, not just text",
+      "intro": "These activities deepen the quality of decisions your team already makes. The AI does not just produce text — it challenges assumptions and surfaces risk.",
+      "activities": [
+        {
+          "n": 6,
+          "activity": "Edge-case surfacing",
+          "does": "Before story sign-off, asks \"what could break or go unhandled?\" on each story.",
+          "buildsToward": "Elaboration discipline"
+        },
+        {
+          "n": 7,
+          "activity": "Code-review gate",
+          "does": "Checks diffs for security gaps, missing error handling, and test coverage before merge.",
+          "buildsToward": "Quality gate"
+        },
+        {
+          "n": 8,
+          "activity": "Test cases from ACs",
+          "does": "Drafts test cases and a UAT demo script directly from the acceptance criteria.",
+          "buildsToward": "UAT sign-off"
+        },
+        {
+          "n": 9,
+          "activity": "AI-assisted retro",
+          "does": "Takes retro notes, clusters themes by type, ranks them, and proposes concrete actions with suggested owners.",
+          "buildsToward": "Closed-loop retros"
+        },
+        {
+          "n": 10,
+          "activity": "5-Whys on incidents",
+          "does": "Runs root-cause analysis on a production incident and classifies the cause as design / technology / process.",
+          "buildsToward": "root-cause-analysis skill"
+        },
+        {
+          "n": 11,
+          "activity": "Backlog grooming assist",
+          "does": "Flags vague, duplicate, or oversized tickets and suggests how to split or sharpen them.",
+          "buildsToward": "Unit decomposition"
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "title": "Approaching AI-DLC discipline: the loop starts to close",
+      "intro": "By this phase, the team is running a recognizable version of the AI-DLC cycle. Completing items 12–17 is the practical signal that formal onboarding will land on fertile ground rather than on an unfamiliar process.",
+      "activities": [
+        {
+          "n": 12,
+          "activity": "Retro → applied change",
+          "does": "Drafts the actual rule or checklist update so a retro finding becomes an applied change within the same sprint.",
+          "buildsToward": "Improvement workflow"
+        },
+        {
+          "n": 13,
+          "activity": "Design-session assist",
+          "does": "Helps the team lock API contracts, data models, and architectural constraints before any building begins.",
+          "buildsToward": "Design session"
+        },
+        {
+          "n": 14,
+          "activity": "Risk and blast-radius check",
+          "does": "Before a sizeable change, assesses impact on other components, rollback options, and whether a feature flag is needed.",
+          "buildsToward": "Bolt risk assessment"
+        },
+        {
+          "n": 15,
+          "activity": "Dependency and security audit",
+          "does": "Reads package manifests monthly, lists risky or outdated packages, and suggests remediation steps.",
+          "buildsToward": "dependency-audit skill"
+        },
+        {
+          "n": 16,
+          "activity": "New-joiner induction",
+          "does": "Walks a new engineer through the codebase and produces a personalized quick-reference card.",
+          "buildsToward": "new-engineer-induction skill"
+        },
+        {
+          "n": 17,
+          "activity": "Capture conventions as a prompt",
+          "does": "Seeds a CLAUDE.md or .cursor/rules/project-rules.mdc with the team's actual coding standards and domain terms — the first step of a real onboarding.",
+          "buildsToward": "Master rule file → full framework adoption"
+        }
+      ]
+    }
+  ]
+}

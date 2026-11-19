@@ -1,0 +1,1031 @@
+---
+import Base from "../layouts/Base.astro";
+import Ratings from "../components/Ratings.astro";
+import { LEVELS, RATINGS, TOOLS, disciplines, expert, levelName, totals } from "../lib/catalog";
+
+const byDiscipline = disciplines.map((d) => ({
+  ...d,
+  agents: expert.agents.filter((a) => a.discipline === d.id).sort((a, b) => a.title.localeCompare(b.title)),
+}));
+
+// Agents counted by autonomy (rows, high first) and human judgement (columns, low first).
+const rowsHighFirst = [...LEVELS].reverse();
+const matrix = rowsHighFirst.map((autonomy) =>
+  LEVELS.map((judgement) => ({
+    autonomy,
+    judgement,
+    count: expert.agents.filter((a) => a.autonomy === autonomy && a.humanJudgement === judgement).length,
+  })),
+);
+const busiest = Math.max(...matrix.flat().map((c) => c.count));
+
+const pkg = expert.npmPackage;
+const setup = {
+  personal: [
+    { tool: "Claude Code", file: "Terminal", code: `claude mcp add -s user ide-expert-agents -- npx -y ${pkg}` },
+    {
+      tool: "Cursor",
+      file: "~/.cursor/mcp.json",
+      code: JSON.stringify({ mcpServers: { "ide-expert-agents": { command: "npx", args: ["-y", pkg] } } }, null, 2),
+    },
+    {
+      tool: "GitHub Copilot",
+      file: ".vscode/mcp.json",
+      code: JSON.stringify({ servers: { "ide-expert-agents": { type: "stdio", command: "npx", args: ["-y", pkg] } } }, null, 2),
+    },
+  ],
+  team: [
+    {
+      tool: "Claude Code",
+      file: "Terminal",
+      code: "claude mcp add --transport http -s user ide-expert-agents http://your-server:3000/mcp",
+    },
+    {
+      tool: "Cursor",
+      file: "~/.cursor/mcp.json",
+      code: JSON.stringify({ mcpServers: { "ide-expert-agents": { url: "http://your-server:3000/mcp" } } }, null, 2),
+    },
+    {
+      tool: "GitHub Copilot",
+      file: ".vscode/mcp.json",
+      code: JSON.stringify({ servers: { "ide-expert-agents": { type: "http", url: "http://your-server:3000/mcp" } } }, null, 2),
+    },
+  ],
+};
+const dockerRun = `docker build -t ide-expert-agents-mcp .
+docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
+---
+
+<Base
+  title="IDE Expert Agents"
+  current="agents"
+  description={`${totals.agents} expert AI agents across ${totals.disciplines} disciplines, served as slash commands in Claude Code, Cursor and GitHub Copilot.`}
+>
+  <section class="intro">
+    <div class="wrap intro-grid">
+      <div class="intro-copy">
+        <p class="lib agents">IDE Expert Agents</p>
+        <h1>A specialist for every task, one command away.</h1>
+        <p class="lede">
+          {totals.agents} agents that carry a specialist’s method, checklists and standards, from OWASP security scans and WCAG
+          audits to PERT estimates and EU AI Act reviews. One MCP server makes them all available in your IDE.
+        </p>
+        <div class="actions">
+          <a class="button" href="#catalog">Browse all {totals.agents} agents</a>
+          <a class="button ghost" href="#setup">Set up in your IDE</a>
+        </div>
+      </div>
+      <ol class="how" aria-label="How it works">
+        <li>
+          <h2>Connect once</h2>
+          <p>Add the MCP server to Claude Code, Cursor or GitHub Copilot. Every agent becomes a slash command.</p>
+        </li>
+        <li>
+          <h2>Call an agent</h2>
+          <p>Run it by name, or describe the task in agent mode and let your assistant pick the agent.</p>
+        </li>
+        <li>
+          <h2>Review the evidence</h2>
+          <p>The agent asks what it needs, follows its method and shows its working. You decide what happens next.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section ratings-map" id="ratings" aria-labelledby="ratings-title">
+    <div class="wrap map-layout">
+      <div class="map-copy">
+        <h2 id="ratings-title">How much the agent does, and how much you decide</h2>
+        <p class="lede">
+          Every agent rates itself on two scales. Use them to decide how closely to follow its work, and how much expertise to bring
+          to what it hands back.
+        </p>
+        <dl class="scales">
+          {
+            Object.entries(RATINGS).map(([key, r]) => (
+              <div class="scale">
+                <dt>
+                  <span class:list={["scale-name", key]}>{r.name}</span>
+                  <span class="scale-question">{r.question}</span>
+                </dt>
+                <dd>
+                  <ul>
+                    {rowsHighFirst.map((l) => (
+                      <li>
+                        <strong>{levelName(l)}</strong>
+                        <span>{r.levels[l]}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <figure class="map">
+        <div class="map-grid" role="group" aria-label="Agents by autonomy and human judgement">
+          <p class="axis axis-y">Autonomy</p>
+          {
+            matrix.map((row) => (
+              <>
+                <p class="row-label">{levelName(row[0].autonomy)}</p>
+                {row.map((cell) => (
+                  <button
+                    type="button"
+                    class:list={["cell", { hot: cell.count / busiest > 0.6 }]}
+                    style={`--heat: ${cell.count / busiest}`}
+                    data-autonomy={cell.autonomy}
+                    data-judgement={cell.judgement}
+                    disabled={cell.count === 0}
+                    aria-label={`${levelName(cell.autonomy)} autonomy, ${cell.judgement} human judgement: ${cell.count} ${cell.count === 1 ? "agent" : "agents"}${cell.count ? ". Show them in the catalog." : ""}`}
+                  >
+                    <span class="n">{cell.count}</span>
+                    <span class="unit">{cell.count === 1 ? "agent" : "agents"}</span>
+                  </button>
+                ))}
+              </>
+            ))
+          }
+          {LEVELS.map((l, i) => <p class="col-label" style={`grid-column: ${i + 3}`}>{levelName(l)}</p>)}
+          <p class="axis axis-x">Human judgement</p>
+        </div>
+        <figcaption>Select a square to see those agents in the catalog.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section catalog" id="catalog" aria-labelledby="catalog-title">
+    <div class="wrap">
+      <div class="catalog-head">
+        <h2 id="catalog-title">The catalog</h2>
+        <div class="controls">
+          <label class="search">
+            <span class="visually-hidden">Search agents</span>
+            <input id="agent-search" type="search" placeholder="Search by task, standard or name" autocomplete="off" />
+          </label>
+          <label class="select">
+            <span>Autonomy</span>
+            <select id="filter-autonomy">
+              <option value="">Any</option>
+              {rowsHighFirst.map((l) => <option value={l}>{levelName(l)}</option>)}
+            </select>
+          </label>
+          <label class="select">
+            <span>Human judgement</span>
+            <select id="filter-judgement">
+              <option value="">Any</option>
+              {rowsHighFirst.map((l) => <option value={l}>{levelName(l)}</option>)}
+            </select>
+          </label>
+          <fieldset class="segmented">
+            <legend class="visually-hidden">Show commands for</legend>
+            {
+              TOOLS.map((t, i) => (
+                <label>
+                  <input type="radio" name="agent-tool" value={t.id} checked={i === 0} />
+                  <span>{t.name}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+        </div>
+      </div>
+
+      <div class="catalog-body">
+        <nav class="filters" aria-label="Disciplines">
+          <ul>
+            <li>
+              <button type="button" class="filter" data-filter="all" aria-pressed="true">
+                <span>All disciplines</span><span class="count">{totals.agents}</span>
+              </button>
+            </li>
+            {
+              byDiscipline.map((d) => (
+                <li>
+                  <button type="button" class="filter" data-filter={d.id} aria-pressed="false">
+                    <span>{d.name}</span>
+                    <span class="count">{d.count}</span>
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="groups">
+          <p class="result-status" aria-live="polite" id="agent-status"></p>
+          {
+            byDiscipline.map((d) => (
+              <section class="group" id={`discipline-${d.id}`} data-discipline={d.id} aria-labelledby={`h-${d.id}`}>
+                <header>
+                  <h3 id={`h-${d.id}`}>{d.name}</h3>
+                  {d.blurb && <p>{d.blurb}</p>}
+                </header>
+                <ul class="agent-list">
+                  {d.agents.map((a) => (
+                    <li
+                      class="agent"
+                      id={a.name}
+                      data-autonomy={a.autonomy ?? ""}
+                      data-judgement={a.humanJudgement ?? ""}
+                      data-search={`${a.name} ${a.title} ${d.name} ${a.whenToUse} ${a.description}`.toLowerCase()}
+                    >
+                      <div class="agent-head">
+                        <h4>{a.title}</h4>
+                        <Ratings autonomy={a.autonomy} judgement={a.humanJudgement} />
+                      </div>
+                      <p class="when">{a.whenToUse}</p>
+                      <details>
+                        <summary>What it does</summary>
+                        <p>{a.description}</p>
+                      </details>
+                      <div class="command">
+                        <span class="hint" data-hint>
+                          Type
+                        </span>
+                        <code id={`cmd-${a.name}`} data-name={a.name}>
+                          {TOOLS[0].command(a.name)}
+                        </code>
+                        <button type="button" class="copy-button" data-copy data-copy-from={`cmd-${a.name}`}>
+                          Copy
+                        </button>
+                        <a class="source" href={a.source}>
+                          Source
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+          <p class="empty" id="agent-empty" hidden>
+            No agents match that search. Try a broader word, like “test”, “security” or “design”, or
+            <a href="https://github.com/xianix-team/ide-expert-agents/blob/main/CONTRIBUTING.md">propose a new agent</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="setup" aria-labelledby="setup-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="setup-title">Set up in your IDE</h2>
+        <p class="lede">
+          Pick the setup that fits. Personal setup runs the published package on your machine. A team server runs once and
+          everyone connects by URL.
+        </p>
+      </div>
+
+      <div class="setup">
+        <article>
+          <h3>Personal setup with npx</h3>
+          <p class="muted">Needs Node 18 or later. Nothing to clone or build.</p>
+          {
+            setup.personal.map((s, i) => (
+              <div class="snippet-block">
+                <header>
+                  <p>
+                    {s.tool} <span class="file">{s.file}</span>
+                  </p>
+                  <button type="button" class="copy-button" data-copy data-copy-from={`personal-${i}`}>
+                    Copy
+                  </button>
+                </header>
+                <pre class="snippet"><code id={`personal-${i}`}>{s.code}</code></pre>
+              </div>
+            ))
+          }
+        </article>
+        <article>
+          <h3>Team server with Docker</h3>
+          <p class="muted">Build once from the repository root on a shared host, then point each IDE at it.</p>
+          <div class="snippet-block">
+            <header>
+              <p>Shared host <span class="file">Terminal</span></p>
+              <button type="button" class="copy-button" data-copy data-copy-from="docker-run">Copy</button>
+            </header>
+            <pre class="snippet"><code id="docker-run">{dockerRun}</code></pre>
+          </div>
+          {
+            setup.team.map((s, i) => (
+              <div class="snippet-block">
+                <header>
+                  <p>
+                    {s.tool} <span class="file">{s.file}</span>
+                  </p>
+                  <button type="button" class="copy-button" data-copy data-copy-from={`team-${i}`}>
+                    Copy
+                  </button>
+                </header>
+                <pre class="snippet"><code id={`team-${i}`}>{s.code}</code></pre>
+              </div>
+            ))
+          }
+        </article>
+      </div>
+      <p class="more">
+        Contributing agents or running from a local clone? Follow the <a href={`${expert.url}/blob/main/mcp-server/README.md`}>full setup guide</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section contribute" aria-labelledby="contribute-title">
+    <div class="wrap contribute-grid">
+      <div>
+        <h2 id="contribute-title">Add your expertise</h2>
+        <p class="lede">
+          Every agent is a markdown file, so anyone who knows a method well can package it for everyone else.
+        </p>
+      </div>
+      <ol class="steps">
+        <li>Create a folder in the right <code>*-agents-store/</code> with an <code>agent.md</code> that has a name and description.</li>
+        <li>Write the method: the questions to ask, the checks to run and the evidence to show.</li>
+        <li>Add it to <code>catalog.json</code>, then open a pull request.</li>
+      </ol>
+      <a class="button" href={`${expert.url}/blob/main/CONTRIBUTING.md`}>Read the contributing guide</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { TOOLS } from "../lib/tools";
+
+  const search = document.querySelector<HTMLInputElement>("#agent-search")!;
+  const byAutonomy = document.querySelector<HTMLSelectElement>("#filter-autonomy")!;
+  const byJudgement = document.querySelector<HTMLSelectElement>("#filter-judgement")!;
+  const filters = [...document.querySelectorAll<HTMLButtonElement>(".filter")];
+  const groups = [...document.querySelectorAll<HTMLElement>(".group")];
+  const status = document.querySelector<HTMLElement>("#agent-status")!;
+  const empty = document.querySelector<HTMLElement>("#agent-empty")!;
+  const toolInputs = document.querySelectorAll<HTMLInputElement>('input[name="agent-tool"]');
+  let active = "all";
+
+  function apply() {
+    const terms = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const group of groups) {
+      const inFilter = active === "all" || group.dataset.discipline === active;
+      let groupShown = 0;
+      for (const agent of group.querySelectorAll<HTMLElement>(".agent")) {
+        const match =
+          inFilter &&
+          (!byAutonomy.value || agent.dataset.autonomy === byAutonomy.value) &&
+          (!byJudgement.value || agent.dataset.judgement === byJudgement.value) &&
+          terms.every((t) => agent.dataset.search!.includes(t));
+        agent.hidden = !match;
+        if (match) groupShown++;
+      }
+      group.hidden = groupShown === 0;
+      shown += groupShown;
+    }
+    empty.hidden = shown > 0;
+    const filtered = terms.length > 0 || active !== "all" || !!byAutonomy.value || !!byJudgement.value;
+    status.textContent = filtered ? `Showing ${shown} ${shown === 1 ? "agent" : "agents"}` : "";
+  }
+
+  search.addEventListener("input", apply);
+  byAutonomy.addEventListener("change", apply);
+  byJudgement.addEventListener("change", apply);
+
+  // A square in the map shows its agents: clear other filters, set both ratings, jump to the catalog.
+  document.querySelectorAll<HTMLButtonElement>(".cell").forEach((cell) =>
+    cell.addEventListener("click", () => {
+      search.value = "";
+      byAutonomy.value = cell.dataset.autonomy!;
+      byJudgement.value = cell.dataset.judgement!;
+      active = "all";
+      filters.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === "all")));
+      apply();
+      document.querySelector("#catalog")!.scrollIntoView({ block: "start" });
+    }),
+  );
+  for (const button of filters) {
+    button.addEventListener("click", () => {
+      active = button.dataset.filter!;
+      filters.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      apply();
+      document.querySelector("#catalog")!.scrollIntoView({ block: "start" });
+    });
+  }
+
+  // Deep links like #discipline-qa-agents-store select that discipline.
+  const fromHash = location.hash.match(/^#discipline-(.+)$/);
+  if (fromHash) filters.find((b) => b.dataset.filter === fromHash[1])?.click();
+
+  function setTool(id: string) {
+    const tool = TOOLS.find((t) => t.id === id) ?? TOOLS[0];
+    document.querySelectorAll<HTMLElement>("code[data-name]").forEach((code) => {
+      code.textContent = tool.command(code.dataset.name!);
+    });
+    document.querySelectorAll<HTMLElement>("[data-hint]").forEach((h) => (h.textContent = tool.hint));
+    toolInputs.forEach((r) => (r.checked = r.value === tool.id));
+    try {
+      localStorage.setItem("copilots-tool", tool.id);
+    } catch {}
+  }
+  toolInputs.forEach((r) => r.addEventListener("change", () => setTool(r.value)));
+  let saved = "claude";
+  try {
+    saved = localStorage.getItem("copilots-tool") ?? saved;
+  } catch {}
+  setTool(saved);
+</script>
+
+<style>
+  .intro {
+    padding-block: clamp(3rem, 7vw, 5.5rem) clamp(3rem, 6vw, 4.5rem);
+    background: var(--agents-tint);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: end;
+  }
+
+  @media (max-width: 60rem) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .intro-copy {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .intro h1 {
+    font-size: clamp(2.5rem, 1.5rem + 4vw, 4.25rem);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .how {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .how li {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0.15rem 0.75rem;
+    counter-increment: step;
+  }
+
+  .how li::before {
+    content: counter(step);
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--agents);
+    color: var(--surface);
+    font-family: var(--display);
+    font-weight: 700;
+  }
+
+  .how h2 {
+    font-size: var(--step-1);
+    font-variation-settings: "wdth" 95;
+    align-self: center;
+  }
+
+  .how p {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .ratings-map {
+    background: var(--surface);
+  }
+
+  .map-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  @media (max-width: 60rem) {
+    .map-layout {
+      grid-template-columns: 1fr;
+    }
+    .map {
+      position: static;
+      max-width: 30rem;
+    }
+  }
+
+  .map-copy {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .scales {
+    display: grid;
+    gap: 1.75rem;
+    margin: 1rem 0 0;
+  }
+
+  .scale dt {
+    display: grid;
+    gap: 0.2rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .scale-name {
+    font-family: var(--display);
+    font-weight: 650;
+    font-size: var(--step-1);
+    color: var(--pine);
+  }
+
+  .scale-name.autonomy {
+    color: var(--agents);
+  }
+
+  .scale-question {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .scale dd {
+    margin: 0;
+  }
+
+  .scale ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+
+  .scale li {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .scale li strong {
+    color: var(--pine);
+  }
+
+  .map {
+    margin: 0;
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .map-grid {
+    display: grid;
+    grid-template-columns: auto auto repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    align-items: center;
+  }
+
+  .axis-y {
+    grid-row: 1 / span 3;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: 600;
+    color: var(--agents);
+    font-size: 0.9375rem;
+  }
+
+  .axis-x {
+    grid-column: 3 / span 3;
+    text-align: center;
+    font-weight: 600;
+    color: var(--pine);
+    font-size: 0.9375rem;
+  }
+
+  .row-label,
+  .col-label {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .row-label {
+    text-align: right;
+    padding-right: 0.25rem;
+  }
+
+  .col-label {
+    text-align: center;
+  }
+
+  .cell {
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    gap: 0.1rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-s);
+    background: color-mix(in srgb, var(--agents) calc(var(--heat) * 85%), var(--paper));
+    color: var(--pine);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 120ms ease;
+  }
+
+  .cell:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--agents);
+  }
+
+  .cell.hot {
+    color: var(--surface);
+    border-color: transparent;
+  }
+
+  .cell:disabled {
+    cursor: default;
+    background: var(--paper);
+    color: var(--muted);
+  }
+
+  .cell .n {
+    font-family: var(--display);
+    font-weight: 750;
+    font-size: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+    line-height: 1;
+  }
+
+  .cell .unit {
+    font-size: 0.8125rem;
+  }
+
+  .map figcaption {
+    margin-top: 1rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .select {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .select select {
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--pine);
+    padding: 0.5rem 2rem 0.5rem 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2315302a' stroke-width='1.5'/%3E%3C/svg%3E")
+      no-repeat right 0.85rem center;
+    appearance: none;
+  }
+
+  .select select:focus-visible {
+    outline: 3px solid var(--agents);
+    outline-offset: 1px;
+  }
+
+  .agent-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1.5rem;
+  }
+
+  .catalog-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .search input {
+    width: min(24rem, 80vw);
+    padding: 0.65rem 1rem;
+    font: inherit;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--pine);
+  }
+
+  .search input:focus {
+    outline: 3px solid var(--agents);
+    outline-offset: 1px;
+  }
+
+  .catalog-body {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  .filters {
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .filters ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .filter {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: transparent;
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--pine);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .filter:hover {
+    background: var(--paper-sunk);
+  }
+
+  .filter[aria-pressed="true"] {
+    background: var(--agents);
+    color: var(--surface);
+  }
+
+  .filter .count {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+
+  @media (max-width: 52rem) {
+    .catalog-body {
+      grid-template-columns: 1fr;
+    }
+    .filters {
+      position: static;
+      overflow-x: auto;
+    }
+    .filters ul {
+      display: flex;
+      gap: 0.4rem;
+      padding-bottom: 0.5rem;
+    }
+    .filter {
+      white-space: nowrap;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+    }
+  }
+
+  .result-status:empty {
+    display: none;
+  }
+
+  .result-status {
+    margin-bottom: 1rem;
+    color: var(--muted);
+  }
+
+  .group + .group {
+    margin-top: 3rem;
+  }
+
+  .group header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--pine);
+  }
+
+  .group header h3 {
+    font-size: var(--step-2);
+  }
+
+  .group header p {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .agent-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .agent {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--rule);
+    scroll-margin-top: 5.5rem;
+  }
+
+  .agent:target {
+    background: linear-gradient(90deg, var(--agents-tint), transparent 70%);
+    box-shadow: -1rem 0 0 var(--agents-tint);
+  }
+
+  .agent h4 {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    font-weight: 650;
+    font-variation-settings: "wdth" 95;
+    color: var(--pine);
+  }
+
+  .when {
+    max-width: var(--measure);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  details {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+
+  summary {
+    cursor: pointer;
+    width: max-content;
+    color: var(--agents);
+    font-weight: 500;
+  }
+
+  details p {
+    margin-top: 0.4rem;
+  }
+
+  .command {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-top: 0.25rem;
+    font-size: var(--step--1);
+  }
+
+  .command .hint {
+    color: var(--muted);
+  }
+
+  .command code {
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: var(--paper-sunk);
+    color: var(--pine);
+    overflow-wrap: anywhere;
+  }
+
+  .command .source {
+    margin-left: auto;
+    color: var(--muted);
+  }
+
+  .empty {
+    padding: 2rem 0;
+    color: var(--muted);
+  }
+
+  .setup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  @media (max-width: 56rem) {
+    .setup {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .setup article {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .setup h3 {
+    font-size: var(--step-2);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .file {
+    margin-left: 0.4rem;
+    font-weight: 400;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+  }
+
+  .snippet {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .more {
+    margin-top: 2.5rem;
+    color: var(--muted);
+  }
+
+  .contribute {
+    background: var(--pine);
+    color: var(--on-pine);
+    border-top: 0 !important;
+  }
+
+  .contribute h2 {
+    color: var(--on-pine);
+  }
+
+  .contribute .lede {
+    color: var(--on-pine-muted);
+    margin-top: 1rem;
+  }
+
+  .contribute-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .contribute-grid .button {
+    grid-column: 2;
+    justify-self: start;
+    background: var(--on-pine);
+    color: var(--pine);
+  }
+
+  @media (max-width: 52rem) {
+    .contribute-grid {
+      grid-template-columns: 1fr;
+    }
+    .contribute-grid .button {
+      grid-column: 1;
+    }
+  }
+
+  .steps {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding-left: 1.4rem;
+  }
+
+  .steps li::marker {
+    font-family: var(--display);
+    font-weight: 700;
+    color: var(--agents-on-pine);
+  }
+
+  .contribute code {
+    color: var(--on-pine);
+  }
+</style>

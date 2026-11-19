@@ -1,0 +1,25 @@
+{
+  "name": "copilots-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "99x Copilots Studio: a website featuring 99x's vetted AI copilot libraries for product engineering teams.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "sync": "node scripts/sync-sources.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "astro": "^7.4.13"
+  },
+  "devDependencies": {
+    "yaml": "^2.9.1"
+  }
+}
