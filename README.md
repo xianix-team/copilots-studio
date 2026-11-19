@@ -12,7 +12,7 @@ The site features 99x's two AI copilot libraries for product engineering teams:
 | Page | What it does |
 |---|---|
 | `/` | A search box that matches a task to agents and skills from both libraries, how the libraries fit the delivery loop, and how to start |
-| `/expert-agents/` | Every agent, searchable and filterable by discipline, with the command for your tool and setup snippets |
+| `/expert-agents/` | Every agent with its autonomy and human-judgement ratings, a map of agents by those two ratings, search and filters, the command for your tool, and setup snippets |
 | `/delivery-framework/` | The delivery loop, agent suite, founding objective, every skill by classification, incremental adoption and entry points |
 
 ## Develop
@@ -39,7 +39,7 @@ IDE_EXPERT_AGENTS_PATH=../ide-expert-agents AI_DLC_BASE_PATH=../ai-dlc-base npm 
 
 What the sync reads:
 
-- **ide-expert-agents**: `catalog.json` for titles, "when to use" text and disciplines, plus each agent's `agent.md` or `SKILL.md` frontmatter for its description.
+- **ide-expert-agents**: `catalog.json` for titles, "when to use" text and disciplines, plus each agent's `agent.md` or `SKILL.md` frontmatter for its description and its `autonomy` and `human-judgement` ratings (high, medium or low; defined in that repo's CONTRIBUTING.md).
 - **ai-dlc-base**: `repository-agents/process-skills-agent/skills-guide.md` for skills, the README's Agent Suite table, and `readme-content/incremental-adoption.md` for the adoption phases.
 
 The script stops with an error if a source file has moved or changed format, so a broken sync never overwrites good data.

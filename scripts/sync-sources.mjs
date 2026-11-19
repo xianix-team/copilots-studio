@@ -73,6 +73,16 @@ function frontmatter(markdown) {
 
 // ---------------------------------------------------------------- ide-expert-agents
 
+// Each agent rates its own autonomy and the human judgement its output needs: high, medium or low.
+// See "Autonomy and human judgement" in the repo's CONTRIBUTING.md for what each level means.
+const LEVELS = new Set(["high", "medium", "low"]);
+function rating(value, where) {
+  const level = String(value ?? "").trim().toLowerCase();
+  if (LEVELS.has(level)) return level;
+  console.warn(`  ! ${where} is ${value === undefined ? "missing" : `"${value}"`}; expected high, medium or low`);
+  return null;
+}
+
 function syncExpertAgents(dir) {
   const meta = revision(dir, SOURCES.ideExpertAgents.repo);
   const catalog = JSON.parse(read(dir, "catalog.json"));
@@ -91,7 +101,13 @@ function syncExpertAgents(dir) {
       const file = ["agent.md", "SKILL.md"].find((f) => existsSync(join(dir, store, folder.name, f)));
       if (!file) continue;
       const fm = frontmatter(read(dir, store, folder.name, file));
-      if (fm.name) folders[fm.name] = { folder: folder.name, description: squash(fm.description) };
+      if (fm.name)
+        folders[fm.name] = {
+          folder: folder.name,
+          description: squash(fm.description),
+          autonomy: rating(fm.autonomy, `${store}/${folder.name} autonomy`),
+          humanJudgement: rating(fm["human-judgement"], `${store}/${folder.name} human-judgement`),
+        };
     }
 
     for (const [name, info] of Object.entries(entry.agents)) {
@@ -105,6 +121,8 @@ function syncExpertAgents(dir) {
         title: squash(info.title),
         whenToUse: squash(info.whenToUse),
         description: found.description,
+        autonomy: found.autonomy,
+        humanJudgement: found.humanJudgement,
         discipline: store,
         source: `${meta.url}/tree/main/${store}/${found.folder}`,
       });

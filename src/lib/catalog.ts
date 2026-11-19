@@ -37,6 +37,35 @@ export const disciplines = Object.keys(DISCIPLINES)
 
 export const disciplineName = (id: string) => disciplines.find((d) => d.id === id)?.name ?? id;
 
+/**
+ * Every expert agent rates itself on two scales, defined in the source repo's CONTRIBUTING.md.
+ * The level wording here paraphrases those definitions.
+ */
+export const LEVELS = ["low", "medium", "high"] as const;
+export type Level = (typeof LEVELS)[number];
+export const levelName = (l: string | null) => (l ? l.charAt(0).toUpperCase() + l.slice(1) : "Not rated");
+
+export const RATINGS = {
+  autonomy: {
+    name: "Autonomy",
+    question: "How much of the task the agent carries out on its own once scope is agreed.",
+    levels: {
+      high: "Runs the task end to end and hands back a finished result.",
+      medium: "Does most of the work, but stops at checkpoints for you to approve or choose.",
+      low: "You drive. The agent facilitates step by step, from your answers and actions.",
+    },
+  },
+  humanJudgement: {
+    name: "Human judgement",
+    question: "How much expert judgement the output needs before anyone acts on it.",
+    levels: {
+      high: "A decision or risk position that a qualified person must evaluate and own.",
+      medium: "A practitioner should review and triage it, with evidence they can check.",
+      low: "Factual or mechanically checkable. A quick sanity check is enough.",
+    },
+  },
+} as const;
+
 export const CLASSIFICATION_LABELS: Record<string, { name: string; hint: string }> = {
   standalone: { name: "Standalone", hint: "Works on its own: copy it in and run it" },
   "needs-config": { name: "Needs config", hint: "Works once you give it one small setting" },
@@ -101,6 +130,8 @@ export type SearchItem = {
   name: string;
   how?: string | null;
   href: string;
+  autonomy?: string | null;
+  judgement?: string | null;
 };
 
 export const sentence = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
@@ -115,6 +146,8 @@ export function searchIndex(base: string): SearchItem[] {
     text: `${a.name} ${a.title} ${disciplineName(a.discipline)} ${a.whenToUse} ${a.description}`.toLowerCase(),
     name: a.name,
     href: `${base}expert-agents/#${a.name}`,
+    autonomy: a.autonomy,
+    judgement: a.humanJudgement,
   }));
   const skills: SearchItem[] = framework.skills.map((s) => ({
     id: `skill:${s.name}`,
