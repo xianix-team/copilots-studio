@@ -215,7 +215,10 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
         </nav>
 
         <div class="groups">
-          <p class="result-status" aria-live="polite" id="agent-status"></p>
+          <div class="result-bar">
+            <p class="result-status" aria-live="polite" id="agent-status"></p>
+            <button type="button" class="copy-button" id="clear-filters" hidden>Clear filters</button>
+          </div>
           {
             byDiscipline.map((d) => (
               <section class="group" id={`discipline-${d.id}`} data-discipline={d.id} aria-labelledby={`h-${d.id}`}>
@@ -364,28 +367,60 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
   const toolInputs = document.querySelectorAll<HTMLInputElement>('input[name="agent-tool"]');
   let active = "all";
 
+  const clear = document.querySelector<HTMLButtonElement>("#clear-filters")!;
+  const countFor = (id: string) => filters.find((b) => b.dataset.filter === id)?.querySelector<HTMLElement>(".count");
+
+  // Every filter is read from the controls themselves, so the list always matches what they show,
+  // including after the browser restores a dropdown's value on reload or Back.
   function apply() {
     const terms = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const matchesRatingsAndSearch = (agent: HTMLElement) =>
+      (!byAutonomy.value || agent.dataset.autonomy === byAutonomy.value) &&
+      (!byJudgement.value || agent.dataset.judgement === byJudgement.value) &&
+      terms.every((t) => agent.dataset.search!.includes(t));
+
     let shown = 0;
+    let total = 0;
     for (const group of groups) {
-      const inFilter = active === "all" || group.dataset.discipline === active;
+      const discipline = group.dataset.discipline!;
+      const inDiscipline = active === "all" || discipline === active;
+      let available = 0;
       let groupShown = 0;
       for (const agent of group.querySelectorAll<HTMLElement>(".agent")) {
-        const match =
-          inFilter &&
-          (!byAutonomy.value || agent.dataset.autonomy === byAutonomy.value) &&
-          (!byJudgement.value || agent.dataset.judgement === byJudgement.value) &&
-          terms.every((t) => agent.dataset.search!.includes(t));
-        agent.hidden = !match;
-        if (match) groupShown++;
+        const match = matchesRatingsAndSearch(agent);
+        if (match) available++;
+        agent.hidden = !(match && inDiscipline);
+        if (!agent.hidden) groupShown++;
       }
+      // Discipline counts reflect the search and rating filters, so they never promise agents that aren't there.
+      const count = countFor(discipline);
+      if (count) count.textContent = String(available);
+      filters.find((b) => b.dataset.filter === discipline)?.classList.toggle("none", available === 0);
       group.hidden = groupShown === 0;
       shown += groupShown;
+      total += available;
     }
+    const all = countFor("all");
+    if (all) all.textContent = String(total);
+
     empty.hidden = shown > 0;
     const filtered = terms.length > 0 || active !== "all" || !!byAutonomy.value || !!byJudgement.value;
-    status.textContent = filtered ? `Showing ${shown} ${shown === 1 ? "agent" : "agents"}` : "";
+    status.textContent = filtered ? `Showing ${shown} of ${groups.reduce((n, g) => n + g.querySelectorAll(".agent").length, 0)} agents` : "";
+    clear.hidden = !filtered;
   }
+
+  function selectDiscipline(id: string) {
+    active = id;
+    filters.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === id)));
+  }
+
+  clear.addEventListener("click", () => {
+    search.value = "";
+    byAutonomy.value = "";
+    byJudgement.value = "";
+    selectDiscipline("all");
+    apply();
+  });
 
   search.addEventListener("input", apply);
   byAutonomy.addEventListener("change", apply);
@@ -397,16 +432,14 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
       search.value = "";
       byAutonomy.value = cell.dataset.autonomy!;
       byJudgement.value = cell.dataset.judgement!;
-      active = "all";
-      filters.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === "all")));
+      selectDiscipline("all");
       apply();
       document.querySelector("#catalog")!.scrollIntoView({ block: "start" });
     }),
   );
   for (const button of filters) {
     button.addEventListener("click", () => {
-      active = button.dataset.filter!;
-      filters.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      selectDiscipline(button.dataset.filter!);
       apply();
       document.querySelector("#catalog")!.scrollIntoView({ block: "start" });
     });
@@ -414,7 +447,12 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
 
   // Deep links like #discipline-qa-agents-store select that discipline.
   const fromHash = location.hash.match(/^#discipline-(.+)$/);
-  if (fromHash) filters.find((b) => b.dataset.filter === fromHash[1])?.click();
+  if (fromHash && filters.some((b) => b.dataset.filter === fromHash[1])) selectDiscipline(fromHash[1]);
+
+  // Apply whatever the controls hold now. Browsers restore dropdown and search values on reload and Back,
+  // sometimes after this script runs, so apply again once the page is shown.
+  apply();
+  window.addEventListener("pageshow", apply);
 
   function setTool(id: string) {
     const tool = TOOLS.find((t) => t.id === id) ?? TOOLS[0];
@@ -817,12 +855,26 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
     }
   }
 
-  .result-status:empty {
+  .result-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .result-bar:has(.result-status:empty) {
     display: none;
   }
 
+  .filter.none {
+    opacity: 0.55;
+  }
+
+  .filter[aria-pressed="true"].none {
+    opacity: 1;
+  }
+
   .result-status {
-    margin-bottom: 1rem;
     color: var(--muted);
   }
 

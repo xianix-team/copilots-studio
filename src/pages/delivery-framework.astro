@@ -341,13 +341,15 @@ const entryPoints = [
   const radios = document.querySelectorAll<HTMLInputElement>('input[name="skill-class"]');
   const skills = document.querySelectorAll<HTMLElement>(".skill");
   const categories = document.querySelectorAll<HTMLElement>("[data-category]");
-  radios.forEach((r) =>
-    r.addEventListener("change", () => {
-      const value = r.value;
-      skills.forEach((s) => (s.hidden = value !== "all" && s.dataset.class !== value));
-      categories.forEach((c) => (c.hidden = [...c.querySelectorAll<HTMLElement>(".skill")].every((s) => s.hidden)));
-    }),
-  );
+  function apply() {
+    const value = [...radios].find((r) => r.checked)?.value ?? "all";
+    skills.forEach((s) => (s.hidden = value !== "all" && s.dataset.class !== value));
+    categories.forEach((c) => (c.hidden = [...c.querySelectorAll<HTMLElement>(".skill")].every((s) => s.hidden)));
+  }
+  radios.forEach((r) => r.addEventListener("change", apply));
+  // The browser may restore the chosen radio on reload or Back.
+  apply();
+  window.addEventListener("pageshow", apply);
 </script>
 
 <style>
