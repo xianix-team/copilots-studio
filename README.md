@@ -12,7 +12,7 @@ The site features 99x's two AI copilot libraries for product engineering teams:
 | Page | What it does |
 |---|---|
 | `/` | A search box that matches a task to agents and skills from both libraries, how the libraries fit the delivery loop, and how to start |
-| `/expert-agents/` | Every agent with its autonomy and human-judgement ratings, a map of agents by those two ratings, search and filters, the command for your tool, and setup snippets |
+| `/expert-agents/` | Every agent with its autonomy and human-judgement ratings, a map of agents by those two ratings, search and filters, the command for your tool, setup snippets, and a skill cart that downloads an install script |
 | `/delivery-framework/` | The delivery loop, agent suite, founding objective, every skill by classification, incremental adoption and entry points |
 
 ## Develop
@@ -45,6 +45,16 @@ What the sync reads:
 The script stops with an error if a source file has moved or changed format, so a broken sync never overwrites good data.
 
 Hand-written content lives in `src/lib/catalog.ts`: discipline display names and blurbs, and which agents and skills appear at each stage of the delivery loop. The build fails if the loop names an agent or skill that no longer exists.
+
+## Skill cart
+
+On `/expert-agents/`, people add agents to a cart, choose their tools (Claude Code, GitHub Copilot, Cursor), and check out to download `install-99x-skills.sh`. The cart is kept in the browser's local storage.
+
+The downloaded script doesn't copy skills itself. It downloads `scripts/install-skills.sh` from ide-expert-agents, pinned to the commit the catalog was last synced from, checks its SHA-256 fingerprint, and answers the installer's questions (project folder, tools, skills, go ahead, replace existing) with the cart's choices. The skills themselves come from the installer's latest `main`.
+
+- The generator is `src/lib/install-script.ts`. It only accepts known tool ids and lowercase-hyphen skill names, so nothing typed into the page can reach the script.
+- `npm run sync` records the installer's commit and fingerprint in `src/data/expert-agents.json`. If the installer's questions change upstream, check the answer sequence in `install-script.ts` against the new version when you re-sync.
+- If the installer is missing from the repo, the sync warns and the cart is turned off.
 
 ## Deploy
 

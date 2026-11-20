@@ -4,6 +4,12 @@
   "commit": "6b8b137",
   "date": "2026-11-19",
   "npmPackage": "@99x-ai-dlc/ide-expert-agents-mcp",
+  "installer": {
+    "path": "scripts/install-skills.sh",
+    "commit": "6b8b1378e72e2b96e81c23f7e190fd7c181f7675",
+    "url": "https://raw.githubusercontent.com/xianix-team/ide-expert-agents/6b8b1378e72e2b96e81c23f7e190fd7c181f7675/scripts/install-skills.sh",
+    "sha256": "fb290a35aaf761aecbe1922fa36a54c29bdef0dee83baadda1594ddc4cbcc022"
+  },
   "disciplines": [
     {
       "id": "idf-agents-store",

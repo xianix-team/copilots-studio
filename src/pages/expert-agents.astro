@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Ratings from "../components/Ratings.astro";
 import { LEVELS, RATINGS, TOOLS, disciplines, expert, levelName, totals } from "../lib/catalog";
+import { INSTALL_TOOLS, SCRIPT_FILENAME } from "../lib/install-script";
 
 const byDiscipline = disciplines.map((d) => ({
   ...d,
@@ -18,6 +19,16 @@ const matrix = rowsHighFirst.map((autonomy) =>
   })),
 );
 const busiest = Math.max(...matrix.flat().map((c) => c.count));
+
+// The skill cart builds an install script around the repo's installer, pinned at sync time.
+const cart = expert.installer
+  ? {
+      installer: { url: expert.installer.url, sha256: expert.installer.sha256, commit: expert.installer.commit, repo: expert.repo },
+      agents: Object.fromEntries(
+        expert.agents.map((a) => [a.name, { title: a.title, discipline: disciplines.find((d) => d.id === a.discipline)?.name ?? "" }]),
+      ),
+    }
+  : null;
 
 const pkg = expert.npmPackage;
 const setup = {
@@ -225,6 +236,11 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
                 <header>
                   <h3 id={`h-${d.id}`}>{d.name}</h3>
                   {d.blurb && <p>{d.blurb}</p>}
+                  {cart && (
+                    <button type="button" class="add-all" data-cart-group={d.id}>
+                      Add all to cart
+                    </button>
+                  )}
                 </header>
                 <ul class="agent-list">
                   {d.agents.map((a) => (
@@ -257,6 +273,11 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
                         <a class="source" href={a.source}>
                           Source
                         </a>
+                        {cart && (
+                          <button type="button" class="cart-toggle" data-cart-item={a.name} aria-pressed="false">
+                            Add to cart
+                          </button>
+                        )}
                       </div>
                     </li>
                   ))}
@@ -281,6 +302,14 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
           Pick the setup that fits. Personal setup runs the published package on your machine. A team server runs once and
           everyone connects by URL.
         </p>
+        {
+          cart && (
+            <p class="native-note">
+              Prefer skills that live in your repository, with no server? Add them to the cart and download one script that
+              installs them as native slash commands for Claude Code, GitHub Copilot or Cursor.
+            </p>
+          )
+        }
       </div>
 
       <div class="setup">
@@ -352,6 +381,117 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
       <a class="button" href={`${expert.url}/blob/main/CONTRIBUTING.md`}>Read the contributing guide</a>
     </div>
   </section>
+
+  {
+    cart && (
+      <>
+        <button type="button" class="cart-fab" id="cart-open" hidden aria-haspopup="dialog">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+            <path
+              d="M3 4h2l2.4 10.2a1.5 1.5 0 0 0 1.5 1.1h8.3a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="9.5" cy="19.5" r="1.5" fill="currentColor" />
+            <circle cx="17" cy="19.5" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Cart</span>
+          <span class="cart-badge" id="cart-count">0</span>
+        </button>
+        <p class="visually-hidden" aria-live="polite" id="cart-announce" />
+
+        <dialog class="cart" id="cart" aria-labelledby="cart-title">
+          <div class="cart-head">
+            <h2 id="cart-title">Your skill cart</h2>
+            <form method="dialog">
+              <button class="cart-close" aria-label="Close cart">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+                  <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </button>
+            </form>
+          </div>
+          <p class="cart-intro">
+            Check out to download one script that installs these skills into your project as native slash commands. No MCP server
+            needed.
+          </p>
+
+          <section class="cart-block" aria-labelledby="cart-skills-title">
+            <h3 id="cart-skills-title">
+              Skills <span id="cart-n" />
+            </h3>
+            <ul class="cart-list" id="cart-list" />
+            <p class="cart-empty" id="cart-empty">
+              Your cart is empty. Add skills from the catalog, then come back to download the install script.
+            </p>
+          </section>
+
+          <fieldset class="cart-block">
+            <legend>Install for</legend>
+            {
+              INSTALL_TOOLS.map((t) => (
+                <label class="check">
+                  <input type="checkbox" name="cart-tool" value={t.id} />
+                  <span>
+                    {t.name} <code>{t.dir}/</code>
+                  </span>
+                </label>
+              ))
+            }
+          </fieldset>
+
+          <fieldset class="cart-block">
+            <legend>If a skill is already in the project</legend>
+            <label class="check">
+              <input type="radio" name="cart-replace" value="no" checked />
+              <span>Keep the installed copy</span>
+            </label>
+            <label class="check">
+              <input type="radio" name="cart-replace" value="yes" />
+              <span>Replace it with the latest version</span>
+            </label>
+          </fieldset>
+
+          <div class="checkout">
+            <button type="button" class="button" id="cart-download">
+              Check out and download script
+            </button>
+            <p class="cart-problem" id="cart-problem" />
+            <p class="cart-done" id="cart-done" hidden>
+              Downloaded <code>{SCRIPT_FILENAME}</code>.
+            </p>
+          </div>
+
+          <section class="cart-block run" aria-labelledby="cart-run-title">
+            <h3 id="cart-run-title">Then run it</h3>
+            <p>From your project folder:</p>
+            <div class="say">
+              <pre class="snippet"><code id="cart-run">bash {SCRIPT_FILENAME}</code></pre>
+              <button type="button" class="copy-button" data-copy data-copy-from="cart-run">
+                Copy
+              </button>
+            </div>
+            <p class="muted">
+              Or pass the folder: <code>bash {SCRIPT_FILENAME} ~/code/my-project</code>. Needs bash, git and curl. On Windows, use
+              Git Bash or WSL. Restart your AI tool afterwards so it picks up the new skills.
+            </p>
+            <details>
+              <summary>Preview the script</summary>
+              <pre class="snippet script-preview"><code id="cart-preview" /></pre>
+            </details>
+          </section>
+
+          <button type="button" class="cart-clear" id="cart-clear">
+            Empty the cart
+          </button>
+        </dialog>
+        <script type="application/json" id="cart-data" set:html={JSON.stringify(cart)} />
+      </>
+    )
+  }
 </Base>
 
 <script>
@@ -471,6 +611,194 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
     saved = localStorage.getItem("copilots-tool") ?? saved;
   } catch {}
   setTool(saved);
+</script>
+
+<script>
+  import { INSTALL_TOOLS, SCRIPT_FILENAME, buildInstallScript, type Installer } from "../lib/install-script";
+
+  const dataEl = document.querySelector("#cart-data");
+  if (dataEl) {
+    const { installer, agents } = JSON.parse(dataEl.textContent!) as {
+      installer: Installer;
+      agents: Record<string, { title: string; discipline: string }>;
+    };
+    const STORE = "copilots-cart";
+    const dialog = document.querySelector<HTMLDialogElement>("#cart")!;
+    const fab = document.querySelector<HTMLButtonElement>("#cart-open")!;
+    const count = document.querySelector<HTMLElement>("#cart-count")!;
+    const announce = document.querySelector<HTMLElement>("#cart-announce")!;
+    const list = document.querySelector<HTMLUListElement>("#cart-list")!;
+    const empty = document.querySelector<HTMLElement>("#cart-empty")!;
+    const n = document.querySelector<HTMLElement>("#cart-n")!;
+    const toolBoxes = [...document.querySelectorAll<HTMLInputElement>('input[name="cart-tool"]')];
+    const replaceRadios = [...document.querySelectorAll<HTMLInputElement>('input[name="cart-replace"]')];
+    const download = document.querySelector<HTMLButtonElement>("#cart-download")!;
+    const problem = document.querySelector<HTMLElement>("#cart-problem")!;
+    const done = document.querySelector<HTMLElement>("#cart-done")!;
+    const preview = document.querySelector<HTMLElement>("#cart-preview")!;
+
+    type State = { skills: string[]; tools: string[]; replace: boolean };
+    let state: State = { skills: [], tools: [], replace: false };
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE) ?? "null");
+      if (saved && Array.isArray(saved.skills)) state = { skills: saved.skills, tools: saved.tools ?? [], replace: !!saved.replace };
+    } catch {}
+    // Drop anything no longer in the catalog, e.g. an agent renamed since the cart was saved.
+    state.skills = state.skills.filter((s) => s in agents);
+    state.tools = state.tools.filter((t) => INSTALL_TOOLS.some((x) => x.id === t));
+    if (state.tools.length === 0) {
+      let preferred = "claude";
+      try {
+        preferred = localStorage.getItem("copilots-tool") ?? preferred;
+      } catch {}
+      state.tools = [INSTALL_TOOLS.some((t) => t.id === preferred) ? preferred : "claude"];
+    }
+
+    const save = () => {
+      try {
+        localStorage.setItem(STORE, JSON.stringify(state));
+      } catch {}
+    };
+
+    const siteUrl = () => location.origin + location.pathname;
+    const script = () =>
+      buildInstallScript({ skills: state.skills, tools: state.tools, replaceExisting: state.replace, installer, siteUrl: siteUrl() });
+
+    function render() {
+      const k = state.skills.length;
+      count.textContent = String(k);
+      fab.hidden = k === 0 && !dialog.open;
+      fab.setAttribute("aria-label", `Open the skill cart, ${k} ${k === 1 ? "skill" : "skills"}`);
+      n.textContent = k ? `(${k})` : "";
+
+      document.querySelectorAll<HTMLButtonElement>("[data-cart-item]").forEach((b) => {
+        const inCart = state.skills.includes(b.dataset.cartItem!);
+        b.setAttribute("aria-pressed", String(inCart));
+        b.textContent = inCart ? "In cart" : "Add to cart";
+      });
+
+      list.replaceChildren(
+        ...state.skills.map((name) => {
+          const li = document.createElement("li");
+          const text = document.createElement("div");
+          const title = document.createElement("p");
+          title.className = "cart-item-title";
+          title.textContent = agents[name].title;
+          const meta = document.createElement("p");
+          meta.className = "cart-item-meta";
+          meta.textContent = `${agents[name].discipline}, /${name}`;
+          text.append(title, meta);
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "cart-remove";
+          remove.textContent = "Remove";
+          remove.setAttribute("aria-label", `Remove ${agents[name].title} from the cart`);
+          remove.addEventListener("click", () => {
+            toggle(name, false);
+            (list.querySelector<HTMLButtonElement>(".cart-remove") ?? download).focus();
+          });
+          li.append(text, remove);
+          return li;
+        }),
+      );
+      empty.hidden = k > 0;
+      toolBoxes.forEach((b) => (b.checked = state.tools.includes(b.value)));
+      replaceRadios.forEach((r) => (r.checked = (r.value === "yes") === state.replace));
+
+      const why = k === 0 ? "Add at least one skill to check out." : state.tools.length === 0 ? "Choose at least one tool." : "";
+      download.disabled = !!why;
+      problem.textContent = why;
+      preview.textContent = why ? "" : script();
+    }
+
+    function toggle(name: string, on?: boolean) {
+      const has = state.skills.includes(name);
+      const want = on ?? !has;
+      if (want && !has) state.skills.push(name);
+      if (!want && has) state.skills = state.skills.filter((s) => s !== name);
+      if (want !== has) announce.textContent = `${want ? "Added" : "Removed"} ${agents[name].title}. ${state.skills.length} in cart.`;
+      done.hidden = true;
+      save();
+      render();
+    }
+
+    document.querySelectorAll<HTMLButtonElement>("[data-cart-item]").forEach((b) =>
+      b.addEventListener("click", () => toggle(b.dataset.cartItem!)),
+    );
+
+    // "Add all" adds the agents currently shown in that discipline, so it respects the active filters.
+    document.querySelectorAll<HTMLButtonElement>("[data-cart-group]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const group = document.querySelector<HTMLElement>(`.group[data-discipline="${b.dataset.cartGroup}"]`)!;
+        const names = [...group.querySelectorAll<HTMLElement>(".agent:not([hidden])")].map((a) => a.id).filter((x) => x in agents);
+        const added = names.filter((x) => !state.skills.includes(x));
+        state.skills.push(...added);
+        announce.textContent = `Added ${added.length} ${added.length === 1 ? "skill" : "skills"}. ${state.skills.length} in cart.`;
+        done.hidden = true;
+        save();
+        render();
+      }),
+    );
+
+    toolBoxes.forEach((b) =>
+      b.addEventListener("change", () => {
+        state.tools = toolBoxes.filter((x) => x.checked).map((x) => x.value);
+        save();
+        render();
+      }),
+    );
+    replaceRadios.forEach((r) =>
+      r.addEventListener("change", () => {
+        state.replace = r.value === "yes" && r.checked;
+        save();
+        render();
+      }),
+    );
+
+    fab.addEventListener("click", () => {
+      dialog.showModal();
+      render();
+    });
+    dialog.addEventListener("close", () => {
+      render();
+      fab.focus();
+    });
+    // Clicking the dimmed backdrop closes the cart.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    download.addEventListener("click", () => {
+      let text: string;
+      try {
+        text = script();
+      } catch (e) {
+        problem.textContent = (e as Error).message;
+        return;
+      }
+      const url = URL.createObjectURL(new Blob([text], { type: "text/x-shellscript" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = SCRIPT_FILENAME;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      done.hidden = false;
+    });
+
+    document.querySelector("#cart-clear")!.addEventListener("click", () => {
+      state.skills = [];
+      announce.textContent = "Cart emptied.";
+      done.hidden = true;
+      save();
+      render();
+    });
+
+    // #cart in the address opens the cart, so it can be linked to.
+    if (location.hash === "#cart" && state.skills.length) dialog.showModal();
+    render();
+  }
 </script>
 
 <style>
@@ -752,6 +1080,286 @@ docker run -d -p 3000:3000 --name ide-expert-agents ide-expert-agents-mcp`;
     align-items: baseline;
     justify-content: space-between;
     gap: 0.4rem 1.5rem;
+  }
+
+  .native-note {
+    max-width: var(--measure);
+    padding-left: 1rem;
+    border-left: 3px solid var(--agents);
+  }
+
+  .group header .add-all {
+    margin-left: auto;
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 500;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--agents);
+    cursor: pointer;
+  }
+
+  .group header .add-all:hover {
+    background: var(--agents-tint);
+  }
+
+  .cart-toggle {
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.2rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--agents);
+    background: transparent;
+    color: var(--agents);
+    cursor: pointer;
+  }
+
+  .cart-toggle:hover {
+    background: var(--agents-tint);
+  }
+
+  .cart-toggle[aria-pressed="true"] {
+    background: var(--agents);
+    color: var(--surface);
+  }
+
+  .cart-toggle[aria-pressed="true"]::before {
+    content: "✓ ";
+  }
+
+  .cart-fab {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.1rem 0.8rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pine);
+    color: var(--on-pine);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 12px 30px -12px rgb(21 48 42 / 0.6);
+  }
+
+  .cart-fab:hover {
+    background: var(--pine-3);
+  }
+
+  .cart-badge {
+    min-width: 1.6rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--agents-on-pine);
+    color: var(--pine);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  dialog.cart {
+    margin: 0 0 0 auto;
+    width: min(34rem, 100vw);
+    height: 100dvh;
+    max-height: 100dvh;
+    max-width: 100vw;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 0;
+    background: var(--paper);
+    color: var(--text);
+    overflow-y: auto;
+  }
+
+  dialog.cart[open] {
+    display: grid;
+    align-content: start;
+    gap: 1.5rem;
+  }
+
+  dialog.cart::backdrop {
+    background: rgb(21 48 42 / 0.45);
+  }
+
+  .cart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .cart-head h2 {
+    font-size: var(--step-2);
+  }
+
+  .cart-close {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--pine);
+    cursor: pointer;
+  }
+
+  .cart-intro {
+    color: var(--muted);
+    margin-top: -0.75rem;
+  }
+
+  .cart-block {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .cart-block h3,
+  .cart-block legend {
+    font-family: var(--display);
+    font-weight: 650;
+    font-size: var(--step-1);
+    color: var(--pine);
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+
+  .cart-block h3 span {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .cart-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cart-list :global(li) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .cart-list :global(.cart-item-title) {
+    font-weight: 600;
+    color: var(--pine);
+  }
+
+  .cart-list :global(.cart-item-meta) {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .cart-list :global(.cart-remove) {
+    flex: none;
+    font: inherit;
+    font-size: var(--step--1);
+    padding: 0.15rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--pine);
+    cursor: pointer;
+  }
+
+  .cart-empty {
+    color: var(--muted);
+  }
+
+  .check {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    cursor: pointer;
+  }
+
+  .check input {
+    accent-color: var(--agents);
+    width: 1.05rem;
+    height: 1.05rem;
+    transform: translateY(0.15em);
+  }
+
+  .check code {
+    margin-left: 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .checkout {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+    padding: 1.25rem;
+    border-radius: var(--radius-m);
+    background: var(--agents-tint);
+  }
+
+  .checkout .button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .cart-problem:empty {
+    display: none;
+  }
+
+  .cart-problem {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .cart-done {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--pine);
+  }
+
+  .run .say {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+
+  .run .say pre {
+    width: 100%;
+  }
+
+  .run details summary {
+    color: var(--agents);
+  }
+
+  .script-preview {
+    margin-top: 0.6rem;
+    max-height: 22rem;
+    overflow: auto;
+    white-space: pre;
+    font-size: 0.75rem;
+  }
+
+  .cart-clear {
+    justify-self: start;
+    font: inherit;
+    font-size: var(--step--1);
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .catalog-head {

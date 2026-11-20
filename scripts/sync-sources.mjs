@@ -9,6 +9,7 @@
 // Re-run this script whenever either repository changes.
 
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -129,9 +130,26 @@ function syncExpertAgents(dir) {
     }
   }
 
+  // The skill installer. Generated install scripts download it pinned to this exact commit and
+  // check this fingerprint, so a later change to its questions can't break a script someone downloaded.
+  const installerPath = "scripts/install-skills.sh";
+  let installer = null;
+  if (existsSync(join(dir, installerPath))) {
+    const commit = git(dir, "rev-parse", "HEAD");
+    installer = {
+      path: installerPath,
+      commit,
+      url: `https://raw.githubusercontent.com/${SOURCES.ideExpertAgents.repo}/${commit}/${installerPath}`,
+      sha256: createHash("sha256").update(readFileSync(join(dir, installerPath))).digest("hex"),
+    };
+  } else {
+    console.warn(`  ! ${installerPath} not found; the site's skill cart will be turned off`);
+  }
+
   return {
     ...meta,
     npmPackage: pkg.name,
+    installer,
     disciplines,
     agents,
   };
